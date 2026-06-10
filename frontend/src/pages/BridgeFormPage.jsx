@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
-import { bridgeApi, STRUCTURE_TYPES } from '../api'
+import { bridgeApi, STRUCTURE_TYPES, SUPERSTRUCTURE_TYPES, SUBSTRUCTURE_TYPES } from '../api'
 
 const ROAD_CLASSES = ['市道', '町道', '村道', '主要地方道', '一般県道', '一般都道府県道', '国道', 'その他']
 const MATERIALS = ['鉄筋コンクリート', 'プレストレストコンクリート', '鋼', '石', '木', '複合', 'その他']
@@ -15,6 +15,7 @@ export default function BridgeFormPage() {
   const [form, setForm] = useState({
     management_number: '',
     bridge_name: '',
+    bridge_name_kana: '',
     road_name: '',
     location: '',
     latitude: '',
@@ -22,6 +23,8 @@ export default function BridgeFormPage() {
     bridge_length: '',
     width: '',
     structure_type: '',
+    superstructure_type: '',
+    substructure_type: '',
     material: '',
     year_built: '',
     road_class: '',
@@ -36,6 +39,7 @@ export default function BridgeFormPage() {
         setForm({
           management_number: b.management_number || '',
           bridge_name: b.bridge_name || '',
+          bridge_name_kana: b.bridge_name_kana || '',
           road_name: b.road_name || '',
           location: b.location || '',
           latitude: b.latitude ?? '',
@@ -43,6 +47,8 @@ export default function BridgeFormPage() {
           bridge_length: b.bridge_length ?? '',
           width: b.width ?? '',
           structure_type: b.structure_type || '',
+          superstructure_type: b.superstructure_type || '',
+          substructure_type: b.substructure_type || '',
           material: b.material || '',
           year_built: b.year_built ?? '',
           road_class: b.road_class || '',
@@ -137,7 +143,7 @@ export default function BridgeFormPage() {
                     placeholder="例: BR-001"
                   />
                 </div>
-                <div className="col-md-8">
+                <div className="col-md-5">
                   <label className="form-label fw-semibold">橋梁名 <span className="text-danger">*</span></label>
                   <input
                     type="text"
@@ -147,6 +153,17 @@ export default function BridgeFormPage() {
                     onChange={handleChange}
                     required
                     placeholder="例: 大川橋"
+                  />
+                </div>
+                <div className="col-md-3">
+                  <label className="form-label fw-semibold">橋梁名（カナ）</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    name="bridge_name_kana"
+                    value={form.bridge_name_kana}
+                    onChange={handleChange}
+                    placeholder="例: オオカワバシ"
                   />
                 </div>
                 <div className="col-md-6">
@@ -227,10 +244,24 @@ export default function BridgeFormPage() {
             <div className="card-body">
               <div className="row g-3">
                 <div className="col-md-4">
-                  <label className="form-label fw-semibold">構造形式</label>
+                  <label className="form-label fw-semibold">橋梁形式</label>
                   <select className="form-select" name="structure_type" value={form.structure_type} onChange={handleChange}>
                     <option value="">選択</option>
                     {STRUCTURE_TYPES.map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </div>
+                <div className="col-md-4">
+                  <label className="form-label fw-semibold">上部工構造</label>
+                  <select className="form-select" name="superstructure_type" value={form.superstructure_type} onChange={handleChange}>
+                    <option value="">選択</option>
+                    {SUPERSTRUCTURE_TYPES.map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </div>
+                <div className="col-md-4">
+                  <label className="form-label fw-semibold">下部工構造</label>
+                  <select className="form-select" name="substructure_type" value={form.substructure_type} onChange={handleChange}>
+                    <option value="">選択</option>
+                    {SUBSTRUCTURE_TYPES.map(s => <option key={s} value={s}>{s}</option>)}
                   </select>
                 </div>
                 <div className="col-md-4">

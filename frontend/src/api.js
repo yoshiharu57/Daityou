@@ -60,6 +60,19 @@ export const STRUCTURE_TYPES = [
   '鋼単純桁橋', '鋼連続桁橋', 'ラーメン橋', 'アーチ橋', 'トラス橋', '吊橋', 'その他',
 ]
 
+export const SUPERSTRUCTURE_TYPES = [
+  'RC桁橋', 'RC床版橋', 'PC桁橋', 'PC床版橋', '鋼桁橋', '鋼床版橋',
+  '鋼ラーメン橋', 'RCラーメン橋', 'PCラーメン橋', 'アーチ橋', 'トラス橋',
+  '斜張橋', '吊橋', 'その他',
+]
+
+export const SUBSTRUCTURE_TYPES = [
+  '逆T式橋台', 'ボックス式橋台', '重力式橋台', 'もたれ式橋台', '杭式橋台',
+  'T型橋脚', '壁式橋脚', '張り出し式橋脚', '円形断面橋脚', '中空橋脚',
+  'ラーメン式橋脚', '直接基礎', '場所打ち杭基礎', '既製杭基礎',
+  '鋼管矢板基礎', 'ケーソン基礎', 'その他',
+]
+
 export function formatDate(dateStr) {
   if (!dateStr) return '—'
   try {

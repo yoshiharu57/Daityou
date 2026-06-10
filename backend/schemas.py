@@ -93,6 +93,7 @@ class InspectionSummary(BaseModel):
 class BridgeBase(BaseModel):
     management_number: str
     bridge_name: str
+    bridge_name_kana: Optional[str] = None
     road_name: Optional[str] = None
     location: Optional[str] = None
     latitude: Optional[float] = None
@@ -100,6 +101,8 @@ class BridgeBase(BaseModel):
     bridge_length: Optional[float] = None
     width: Optional[float] = None
     structure_type: Optional[str] = None
+    superstructure_type: Optional[str] = None
+    substructure_type: Optional[str] = None
     material: Optional[str] = None
     year_built: Optional[int] = None
     road_class: Optional[str] = None
@@ -130,12 +133,14 @@ class BridgeListItem(BaseModel):
     id: int
     management_number: str
     bridge_name: str
+    bridge_name_kana: Optional[str] = None
     road_name: Optional[str] = None
     location: Optional[str] = None
     latitude: Optional[float] = None
     longitude: Optional[float] = None
     last_inspection_date: Optional[date] = None
     last_health_rating: Optional[str] = None
+    next_inspection_date: Optional[date] = None
     inspection_count: int = 0
 
     class Config:
