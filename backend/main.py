@@ -28,6 +28,12 @@ app.include_router(bridges.router)
 app.include_router(inspections.router)
 app.include_router(photos.router)
 
+
+@app.get("/health")
+def health_check():
+    return {"status": "ok", "message": "橋梁管理システムが稼働中です"}
+
+
 frontend_build = os.path.join(os.path.dirname(__file__), "..", "frontend", "dist")
 if os.path.exists(frontend_build):
     app.mount("/assets", StaticFiles(directory=os.path.join(frontend_build, "assets")), name="assets")
@@ -38,10 +44,4 @@ if os.path.exists(frontend_build):
 
     @app.get("/{full_path:path}", response_class=FileResponse)
     def catch_all(full_path: str):
-        index = os.path.join(frontend_build, "index.html")
-        return index
-
-
-@app.get("/health")
-def health_check():
-    return {"status": "ok", "message": "橋梁管理システムが稼働中です"}
+        return os.path.join(frontend_build, "index.html")
