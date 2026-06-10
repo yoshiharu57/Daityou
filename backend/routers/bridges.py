@@ -42,12 +42,14 @@ def list_bridges(
             id=bridge.id,
             management_number=bridge.management_number,
             bridge_name=bridge.bridge_name,
+            bridge_name_kana=bridge.bridge_name_kana,
             road_name=bridge.road_name,
             location=bridge.location,
             latitude=bridge.latitude,
             longitude=bridge.longitude,
             last_inspection_date=last_inspection.inspection_date if last_inspection else None,
             last_health_rating=last_inspection.health_rating if last_inspection else None,
+            next_inspection_date=last_inspection.next_inspection_date if last_inspection else None,
             inspection_count=count,
         ))
     return result

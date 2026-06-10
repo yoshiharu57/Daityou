@@ -35,6 +35,7 @@ export default function BridgeLedger({ bridge, latestInspection }) {
                   <p className="section-title">識別情報</p>
                   <Field label="管理番号" value={bridge.management_number} />
                   <Field label="橋梁名" value={bridge.bridge_name} />
+                  <Field label="橋梁名（カナ）" value={bridge.bridge_name_kana} />
                   <Field label="路線名" value={bridge.road_name} />
                   <Field label="道路種別" value={bridge.road_class} />
                   <Field label="管理者" value={bridge.administrator} />
@@ -67,7 +68,9 @@ export default function BridgeLedger({ bridge, latestInspection }) {
               <div className="row">
                 <div className="col-md-6">
                   <p className="section-title">構造諸元</p>
-                  <Field label="構造形式" value={bridge.structure_type} />
+                  <Field label="橋梁形式" value={bridge.structure_type} />
+                  <Field label="上部工構造" value={bridge.superstructure_type} />
+                  <Field label="下部工構造" value={bridge.substructure_type} />
                   <Field label="材料" value={bridge.material} />
                   <div className="row">
                     <div className="col-6">
@@ -95,6 +98,10 @@ export default function BridgeLedger({ bridge, latestInspection }) {
                   <Field
                     label="前回点検年月"
                     value={latestInspection ? formatDate(latestInspection.inspection_date) : null}
+                  />
+                  <Field
+                    label="次回点検予定日"
+                    value={latestInspection?.next_inspection_date ? formatDateFull(latestInspection.next_inspection_date) : null}
                   />
                   <div className="ledger-field mb-3">
                     <label className="d-block">健全性区分</label>
@@ -202,8 +209,16 @@ export default function BridgeLedger({ bridge, latestInspection }) {
                     </td>
                   </tr>
                   <tr>
-                    <td className="text-muted ps-3">構造形式</td>
+                    <td className="text-muted ps-3">橋梁形式</td>
                     <td className="text-end pe-3">{bridge.structure_type || '—'}</td>
+                  </tr>
+                  <tr>
+                    <td className="text-muted ps-3">上部工構造</td>
+                    <td className="text-end pe-3">{bridge.superstructure_type || '—'}</td>
+                  </tr>
+                  <tr>
+                    <td className="text-muted ps-3">下部工構造</td>
+                    <td className="text-end pe-3">{bridge.substructure_type || '—'}</td>
                   </tr>
                   <tr>
                     <td className="text-muted ps-3">材料</td>
