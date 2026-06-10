@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WebMarketing Pro | 売上を劇的に変えるWebマーケティング講座</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#6c3de8;
+  --primary-dark:#4e25c4;
+  --secondary:#f7a100;
+  --accent:#00d4ff;
+  --dark:#0d0d1a;
+  --text:#2d2d3a;
+}
+body{font-family:'Noto Sans JP',sans-serif;color:var(--text);overflow-x:hidden}
+/* ── ナビ ── */
+.navbar-custom{position:fixed;top:0;left:0;right:0;z-index:1000;padding:.8rem 0;transition:all .3s;background:rgba(13,13,26,.95);backdrop-filter:blur(10px)}
+.navbar-custom .nav-link{color:rgba(255,255,255,.85)!important;font-weight:500;transition:color .2s}
+.navbar-custom .nav-link:hover{color:#fff!important}
+.btn-nav{background:linear-gradient(135deg,var(--primary),#9b59ff);color:#fff!important;border-radius:25px;padding:.4rem 1.2rem!important;font-weight:700!important}
+.btn-nav:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(108,61,232,.5)}
+
+/* ── ヒーロー ── */
+.hero{background:linear-gradient(135deg,#0d0d1a 0%,#1a0a3d 40%,#0a1a3d 100%);min-height:100vh;display:flex;align-items:center;position:relative;overflow:hidden;padding-top:80px}
+.hero::before{content:'';position:absolute;top:-200px;right:-200px;width:700px;height:700px;background:radial-gradient(circle,rgba(108,61,232,.35) 0%,transparent 70%);animation:pulse 6s ease-in-out infinite}
+.hero::after{content:'';position:absolute;bottom:-200px;left:-100px;width:500px;height:500px;background:radial-gradient(circle,rgba(0,212,255,.2) 0%,transparent 70%);animation:pulse 8s ease-in-out infinite 2s}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+.hero-badge{display:inline-block;background:linear-gradient(135deg,rgba(108,61,232,.3),rgba(0,212,255,.2));border:1px solid rgba(108,61,232,.5);color:#a78bfa;border-radius:25px;padding:.35rem 1.2rem;font-size:.85rem;font-weight:700;letter-spacing:.05em;margin-bottom:1.5rem}
+.hero h1{font-size:clamp(2rem,5vw,3.6rem);font-weight:900;color:#fff;line-height:1.15;margin-bottom:1.5rem}
+.hero h1 .highlight{background:linear-gradient(135deg,var(--secondary),#ff6b6b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{font-size:1.15rem;color:rgba(255,255,255,.75);line-height:1.8;margin-bottom:2rem;max-width:600px}
+.btn-hero-primary{background:linear-gradient(135deg,var(--primary),#9b59ff);color:#fff;border:none;border-radius:50px;padding:1rem 2.5rem;font-size:1.1rem;font-weight:700;cursor:pointer;transition:all .3s;text-decoration:none;display:inline-block}
+.btn-hero-primary:hover{transform:translateY(-3px);box-shadow:0 15px 40px rgba(108,61,232,.5);color:#fff}
+.btn-hero-secondary{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.3);border-radius:50px;padding:.95rem 2.5rem;font-size:1.1rem;font-weight:700;cursor:pointer;transition:all .3s;text-decoration:none;display:inline-block}
+.btn-hero-secondary:hover{border-color:#fff;background:rgba(255,255,255,.1);color:#fff}
+.hero-stat{text-align:center;padding:1.5rem 1rem;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:16px;backdrop-filter:blur(10px)}
+.hero-stat .num{font-size:2.4rem;font-weight:900;background:linear-gradient(135deg,var(--secondary),#ff6b6b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-stat .label{color:rgba(255,255,255,.6);font-size:.85rem;margin-top:.25rem}
+.floating-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:2rem;backdrop-filter:blur(20px);animation:float 6s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-15px)}}
+.check-item{display:flex;align-items:center;gap:.75rem;padding:.6rem 0;color:rgba(255,255,255,.85);font-size:.95rem}
+.check-item i{color:#7fff7f;font-size:1.1rem;flex-shrink:0}
+
+/* ── セクション共通 ── */
+section{padding:5rem 0}
+.section-badge{display:inline-block;background:rgba(108,61,232,.1);color:var(--primary);border:1px solid rgba(108,61,232,.3);border-radius:20px;padding:.3rem 1rem;font-size:.82rem;font-weight:700;letter-spacing:.08em;margin-bottom:1rem}
+.section-title{font-size:clamp(1.8rem,4vw,2.8rem);font-weight:900;line-height:1.2;margin-bottom:1rem}
+.section-title .accent{color:var(--primary)}
+.section-sub{font-size:1.05rem;color:#666;line-height:1.8;max-width:600px;margin:0 auto}
+
+/* ── 数字実績 ── */
+.stats-section{background:linear-gradient(135deg,var(--primary-dark),var(--primary));padding:4rem 0}
+.stat-item{text-align:center;color:#fff}
+.stat-item .num{font-size:3rem;font-weight:900;display:block}
+.stat-item .unit{font-size:1.5rem}
+.stat-item .lbl{font-size:.9rem;opacity:.8;margin-top:.3rem}
+
+/* ── 悩み ── */
+.problem-card{background:#fff;border-radius:20px;padding:2rem;box-shadow:0 4px 30px rgba(0,0,0,.08);border-left:4px solid #ff6b6b;transition:transform .3s,box-shadow .3s}
+.problem-card:hover{transform:translateY(-5px);box-shadow:0 15px 40px rgba(0,0,0,.12)}
+.problem-card .icon{font-size:2rem;margin-bottom:1rem}
+.problem-card h4{font-weight:700;margin-bottom:.5rem;font-size:1rem}
+
+/* ── 特徴 ── */
+.bg-light-custom{background:#f8f6ff}
+.feature-card{background:#fff;border-radius:24px;padding:2.5rem 2rem;box-shadow:0 4px 30px rgba(108,61,232,.08);border:1px solid rgba(108,61,232,.1);transition:all .3s;height:100%}
+.feature-card:hover{transform:translateY(-8px);box-shadow:0 20px 50px rgba(108,61,232,.15);border-color:var(--primary)}
+.feature-icon{width:70px;height:70px;border-radius:20px;background:linear-gradient(135deg,var(--primary),#9b59ff);display:flex;align-items:center;justify-content:center;margin-bottom:1.5rem}
+.feature-icon i{font-size:1.8rem;color:#fff}
+.feature-card h4{font-weight:800;font-size:1.1rem;margin-bottom:.75rem}
+.feature-card p{color:#666;line-height:1.8;font-size:.93rem}
+
+/* ── カリキュラム ── */
+.curriculum-item{background:#fff;border-radius:16px;padding:1.5rem 2rem;margin-bottom:1rem;box-shadow:0 2px 15px rgba(0,0,0,.06);display:flex;align-items:flex-start;gap:1.5rem;cursor:pointer;transition:all .3s;border:1px solid #f0eeff}
+.curriculum-item:hover{border-color:var(--primary);box-shadow:0 5px 25px rgba(108,61,232,.12);transform:translateX(5px)}
+.curriculum-num{width:48px;height:48px;background:linear-gradient(135deg,var(--primary),#9b59ff);border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:1rem;flex-shrink:0}
+.curriculum-item h5{font-weight:700;margin-bottom:.3rem;font-size:1rem}
+.curriculum-item p{color:#666;font-size:.88rem;margin-bottom:0;line-height:1.6}
+.curriculum-tag{display:inline-block;background:#f0eeff;color:var(--primary);border-radius:10px;padding:.15rem .6rem;font-size:.75rem;font-weight:700;margin-right:.3rem}
+
+/* ── 講師 ── */
+.instructor-section{background:linear-gradient(135deg,#0d0d1a,#1a0a3d);padding:5rem 0}
+.instructor-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:30px;padding:3rem;backdrop-filter:blur(20px)}
+.instructor-avatar{width:140px;height:140px;border-radius:50%;border:4px solid var(--primary);object-fit:cover;background:linear-gradient(135deg,var(--primary),#9b59ff);display:flex;align-items:center;justify-content:center;font-size:4rem;color:#fff;margin:0 auto}
+.instructor-badge{display:inline-block;background:linear-gradient(135deg,var(--secondary),#ff9f43);color:#fff;border-radius:20px;padding:.3rem 1rem;font-size:.8rem;font-weight:700;margin:.25rem}
+.achievement{background:rgba(255,255,255,.08);border-radius:16px;padding:1.25rem;text-align:center;color:#fff}
+.achievement .num{font-size:1.8rem;font-weight:900;color:var(--secondary)}
+.achievement .lbl{font-size:.8rem;opacity:.7;margin-top:.2rem}
+
+/* ── 声 ── */
+.testimonial-card{background:#fff;border-radius:24px;padding:2.5rem 2rem;box-shadow:0 5px 30px rgba(0,0,0,.08);transition:transform .3s;height:100%}
+.testimonial-card:hover{transform:translateY(-5px)}
+.testimonial-card .stars{color:var(--secondary);font-size:1.1rem;margin-bottom:1rem}
+.testimonial-card p{color:#444;line-height:1.9;font-size:.95rem;margin-bottom:1.5rem}
+.testimonial-card .author{display:flex;align-items:center;gap:.75rem}
+.author-avatar{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,var(--primary),#9b59ff);display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:#fff;font-weight:700}
+.author-name{font-weight:700;font-size:.9rem}
+.author-title{font-size:.8rem;color:#888}
+.result-tag{display:inline-block;background:#fff0f0;color:#e74c3c;border-radius:10px;padding:.2rem .7rem;font-size:.78rem;font-weight:700;margin-bottom:1rem}
+.result-tag.green{background:#f0fff4;color:#27ae60}
+.result-tag.blue{background:#f0f8ff;color:#2980b9}
+
+/* ── 料金 ── */
+.pricing-card{background:#fff;border-radius:28px;padding:3rem 2.5rem;box-shadow:0 5px 30px rgba(0,0,0,.08);border:2px solid transparent;transition:all .3s;position:relative;overflow:hidden}
+.pricing-card.featured{border-color:var(--primary);transform:scale(1.05)}
+.pricing-card.featured::before{content:'人気No.1';position:absolute;top:20px;right:-25px;background:linear-gradient(135deg,var(--secondary),#ff9f43);color:#fff;padding:.3rem 3rem;font-weight:700;font-size:.8rem;transform:rotate(45deg)}
+.price-label{font-size:.85rem;color:#888;margin-bottom:.5rem}
+.price{font-size:3rem;font-weight:900;color:var(--dark);line-height:1}
+.price span{font-size:1rem;font-weight:500;color:#888}
+.price-tax{font-size:.8rem;color:#aaa;margin-top:.25rem}
+.plan-feature{display:flex;align-items:center;gap:.75rem;padding:.5rem 0;border-bottom:1px solid #f5f5f5;font-size:.9rem}
+.plan-feature i.bi-check-circle-fill{color:#27ae60}
+.plan-feature i.bi-x-circle-fill{color:#ccc}
+.btn-plan{width:100%;border-radius:50px;padding:.9rem;font-weight:700;font-size:1rem;transition:all .3s;border:none;cursor:pointer;text-decoration:none;display:block;text-align:center}
+.btn-plan-primary{background:linear-gradient(135deg,var(--primary),#9b59ff);color:#fff}
+.btn-plan-primary:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(108,61,232,.4);color:#fff}
+.btn-plan-outline{background:#fff;color:var(--primary);border:2px solid var(--primary)}
+.btn-plan-outline:hover{background:var(--primary);color:#fff}
+
+/* ── FAQ ── */
+.faq-item{background:#fff;border-radius:16px;margin-bottom:1rem;box-shadow:0 2px 15px rgba(0,0,0,.06);overflow:hidden;border:1px solid #f0eeff}
+.faq-q{padding:1.5rem 2rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:.95rem;user-select:none;transition:background .2s}
+.faq-q:hover{background:#faf8ff}
+.faq-q.open{background:#f8f4ff;color:var(--primary)}
+.faq-q .toggle{font-size:1.2rem;transition:transform .3s;color:var(--primary)}
+.faq-q.open .toggle{transform:rotate(45deg)}
+.faq-a{display:none;padding:0 2rem 1.5rem;color:#555;line-height:1.9;font-size:.92rem}
+.faq-a.open{display:block}
+
+/* ── CTA ── */
+.cta-section{background:linear-gradient(135deg,#0d0d1a 0%,#1a0a3d 100%);padding:6rem 0;position:relative;overflow:hidden}
+.cta-section::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:800px;height:800px;background:radial-gradient(circle,rgba(108,61,232,.25) 0%,transparent 70%);pointer-events:none}
+.cta-section h2{font-size:clamp(2rem,4vw,3rem);font-weight:900;color:#fff;margin-bottom:1rem}
+.cta-section p{color:rgba(255,255,255,.7);font-size:1.1rem;margin-bottom:2.5rem}
+.cta-guarantee{display:inline-flex;align-items:center;gap:.5rem;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:30px;padding:.5rem 1.5rem;color:rgba(255,255,255,.8);font-size:.85rem;margin-bottom:2rem}
+
+/* ── フッター ── */
+footer{background:#0d0d1a;color:rgba(255,255,255,.6);padding:4rem 0 2rem}
+footer .footer-logo{font-size:1.5rem;font-weight:900;color:#fff;margin-bottom:.75rem}
+footer .footer-logo span{color:var(--secondary)}
+footer a{color:rgba(255,255,255,.5);text-decoration:none;transition:color .2s}
+footer a:hover{color:#fff}
+.footer-link{display:block;padding:.3rem 0;font-size:.88rem}
+.footer-divider{border-color:rgba(255,255,255,.1)}
+.social-btn{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.08);display:inline-flex;align-items:center;justify-content:center;margin-right:.5rem;transition:all .2s;color:rgba(255,255,255,.6)}
+.social-btn:hover{background:var(--primary);color:#fff}
+
+/* ── アニメーション ── */
+.fade-in{opacity:0;transform:translateY(30px);transition:opacity .7s,transform .7s}
+.fade-in.visible{opacity:1;transform:translateY(0)}
+@media(max-width:768px){
+  .hero h1{font-size:2rem}
+  .pricing-card.featured{transform:scale(1)}
+  .hero-btn-group{flex-direction:column}
+  .hero-btn-group a{text-align:center}
+}
+</style>
+</head>
+<body>
+
+<!-- ナビゲーション -->
+<nav class="navbar-custom">
+  <div class="container d-flex justify-content-between align-items-center">
+    <a href="#" class="text-decoration-none d-flex align-items-center gap-2">
+      <div style="width:34px;height:34px;background:linear-gradient(135deg,var(--primary),#9b59ff);border-radius:10px;display:flex;align-items:center;justify-content:center">
+        <i class="bi bi-rocket-takeoff-fill text-white" style="font-size:.95rem"></i>
+      </div>
+      <span style="font-size:1.1rem;font-weight:900;color:#fff">WebMarketing<span style="color:var(--secondary)">Pro</span></span>
+    </a>
+    <div class="d-none d-md-flex align-items-center gap-4">
+      <a href="#features" class="nav-link text-decoration-none">特徴</a>
+      <a href="#curriculum" class="nav-link text-decoration-none">カリキュラム</a>
+      <a href="#pricing" class="nav-link text-decoration-none">料金</a>
+      <a href="#faq" class="nav-link text-decoration-none">FAQ</a>
+      <a href="#pricing" class="btn-nav nav-link text-decoration-none">今すぐ始める</a>
+    </div>
+    <a href="#pricing" class="btn-nav nav-link text-decoration-none d-md-none" style="font-size:.85rem;padding:.35rem .9rem!important">今すぐ始める</a>
+  </div>
+</nav>
+
+<!-- ヒーローセクション -->
+<section class="hero">
+  <div class="container position-relative" style="z-index:2">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6">
+        <div class="hero-badge"><i class="bi bi-stars me-1"></i>累計受講者数 12,400名突破</div>
+        <h1>
+          <span class="highlight">売上3倍</span>を<br>
+          実現する<br>
+          Webマーケティング<br>
+          の全てを学ぶ
+        </h1>
+        <p>SEO・SNS・Web広告・コンテンツマーケティング…<br>
+        バラバラな知識を体系的に学び、<strong style="color:#fff">今すぐ使える実践スキル</strong>を習得。副業・転職・ビジネス拡大を実現しましょう。</p>
+        <div class="d-flex gap-3 flex-wrap hero-btn-group mb-4">
+          <a href="#pricing" class="btn-hero-primary">
+            <i class="bi bi-play-circle-fill me-2"></i>無料体験レッスンを受ける
+          </a>
+          <a href="#curriculum" class="btn-hero-secondary">
+            <i class="bi bi-book-open me-2"></i>カリキュラムを見る
+          </a>
+        </div>
+        <div class="d-flex align-items-center gap-3 flex-wrap" style="font-size:.85rem;color:rgba(255,255,255,.6)">
+          <span><i class="bi bi-shield-check text-success me-1"></i>30日間返金保証</span>
+          <span><i class="bi bi-clock me-1 text-warning"></i>いつでも・どこでも受講</span>
+          <span><i class="bi bi-infinity me-1" style="color:#a78bfa"></i>永久アクセス権</span>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="floating-card">
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <div style="width:50px;height:50px;background:linear-gradient(135deg,var(--secondary),#ff9f43);border-radius:15px;display:flex;align-items:center;justify-content:center;font-size:1.5rem">🚀</div>
+            <div>
+              <div style="color:#fff;font-weight:800;font-size:1.1rem">このコースで学べること</div>
+              <div style="color:rgba(255,255,255,.5);font-size:.82rem">全8ステップの体系的プログラム</div>
+            </div>
+          </div>
+          <div class="check-item"><i class="bi bi-check-circle-fill"></i>Google SEO完全攻略 — 検索1位を獲る戦略</div>
+          <div class="check-item"><i class="bi bi-check-circle-fill"></i>SNS集客マスター — Instagram/X/TikTok活用法</div>
+          <div class="check-item"><i class="bi bi-check-circle-fill"></i>Web広告で即効果 — Google/Meta広告運用</div>
+          <div class="check-item"><i class="bi bi-check-circle-fill"></i>コンテンツ設計 — 読まれて売れる文章術</div>
+          <div class="check-item"><i class="bi bi-check-circle-fill"></i>データ分析 — GA4で改善サイクルを回す</div>
+          <div class="check-item"><i class="bi bi-check-circle-fill"></i>マーケ戦略 — 売上を仕組み化するフレームワーク</div>
+          <div style="margin-top:1.5rem;background:rgba(108,61,232,.2);border-radius:12px;padding:1rem;display:flex;align-items:center;justify-content:space-between">
+            <div style="color:rgba(255,255,255,.6);font-size:.85rem">次回開講まで</div>
+            <div id="countdown" style="color:var(--secondary);font-weight:900;font-size:1.2rem">— : — : —</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- 実績数字 -->
+    <div class="row g-3 mt-5">
+      <div class="col-6 col-md-3"><div class="hero-stat"><div class="num">12,400<span style="font-size:1.2rem">名</span></div><div class="label">累計受講者数</div></div></div>
+      <div class="col-6 col-md-3"><div class="hero-stat"><div class="num">4.9<span style="font-size:1.2rem">点</span></div><div class="label">平均満足度</div></div></div>
+      <div class="col-6 col-md-3"><div class="hero-stat"><div class="num">93<span style="font-size:1.2rem">%</span></div><div class="label">目標達成率</div></div></div>
+      <div class="col-6 col-md-3"><div class="hero-stat"><div class="num">200<span style="font-size:1.2rem">本+</span></div><div class="label">動画コンテンツ</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- こんな悩みありませんか -->
+<section style="background:#fff;padding:5rem 0">
+  <div class="container">
+    <div class="text-center mb-5 fade-in">
+      <div class="section-badge">PROBLEM</div>
+      <h2 class="section-title">こんな悩み、<span class="accent">ありませんか？</span></h2>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-4 fade-in">
+        <div class="problem-card">
+          <div class="icon">😓</div>
+          <h4>Webマーケの知識がバラバラで体系化できていない</h4>
+          <p style="color:#666;font-size:.9rem;line-height:1.7;margin:0">SEO・SNS・広告…それぞれ学んでいるのに、全体像が見えずビジネスに活かせない</p>
+        </div>
+      </div>
+      <div class="col-md-4 fade-in">
+        <div class="problem-card">
+          <div class="icon">📉</div>
+          <h4>集客はできるのに売上に繋がらない</h4>
+          <p style="color:#666;font-size:.9rem;line-height:1.7;margin:0">アクセスはあるのに問い合わせ・購入が増えない。何が問題なのかわからない</p>
+        </div>
+      </div>
+      <div class="col-md-4 fade-in">
+        <div class="problem-card">
+          <div class="icon">⏰</div>
+          <h4>独学では時間がかかりすぎて挫折してしまう</h4>
+          <p style="color:#666;font-size:.9rem;line-height:1.7;margin:0">YouTube・ブログで学んでいるが、情報が多すぎて何から手をつければいいかわからない</p>
+        </div>
+      </div>
+    </div>
+    <div class="text-center mt-5 fade-in">
+      <div style="background:#f8f4ff;border-radius:20px;padding:2.5rem;max-width:700px;margin:0 auto;border:2px dashed rgba(108,61,232,.3)">
+        <div style="font-size:2rem;margin-bottom:1rem">✨</div>
+        <h3 style="font-weight:800;color:var(--primary);margin-bottom:.75rem">その悩み、WebMarketing Proが解決します</h3>
+        <p style="color:#555;line-height:1.8;margin:0">現役マーケターが設計した体系的カリキュラムで、最短3ヶ月でプロレベルのマーケティングスキルを習得できます</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 実績数字 -->
+<section class="stats-section">
+  <div class="container">
+    <div class="row g-4 text-center">
+      <div class="col-6 col-md-3 fade-in"><div class="stat-item"><span class="num">300<span class="unit">%</span></span><div class="lbl">受講者の平均売上増加率</div></div></div>
+      <div class="col-6 col-md-3 fade-in"><div class="stat-item"><span class="num">8<span class="unit">週</span></span><div class="lbl">で成果を実感できる</div></div></div>
+      <div class="col-6 col-md-3 fade-in"><div class="stat-item"><span class="num">24<span class="unit">時間</span></span><div class="lbl">コミュニティサポート</div></div></div>
+      <div class="col-6 col-md-3 fade-in"><div class="stat-item"><span class="num">No.1<span class="unit"></span></span><div class="lbl">4年連続顧客満足度</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 選ばれる理由 -->
+<section id="features" class="bg-light-custom">
+  <div class="container">
+    <div class="text-center mb-5 fade-in">
+      <div class="section-badge">FEATURES</div>
+      <h2 class="section-title">他のスクールと<span class="accent">ここが違う</span></h2>
+      <p class="section-sub">理論だけでなく、今日から使える実践スキルを重視した設計</p>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-6 col-lg-4 fade-in">
+        <div class="feature-card">
+          <div class="feature-icon"><i class="bi bi-lightning-charge-fill"></i></div>
+          <h4>現役プロが教える実践カリキュラム</h4>
+          <p>年商10億円企業のマーケティングを担当する現役プロが、実際に使っている手法だけを厳選。理論ではなく「明日すぐ使える」スキルを習得できます。</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4 fade-in">
+        <div class="feature-card">
+          <div class="feature-icon"><i class="bi bi-people-fill"></i></div>
+          <h4>少人数制・個別フィードバック</h4>
+          <p>グループワークや個別コンサルで、あなたのビジネスに合わせたフィードバックを提供。一人で悩まず、確実に成果へ繋げます。</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4 fade-in">
+        <div class="feature-card">
+          <div class="feature-icon"><i class="bi bi-infinity"></i></div>
+          <h4>コンテンツ永久アクセス権</h4>
+          <p>購入後は期限なし・何度でも視聴可能。マーケティングのトレンドは変わるため、定期的な内容アップデートも無料で提供します。</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4 fade-in">
+        <div class="feature-card">
+          <div class="feature-icon"><i class="bi bi-graph-up-arrow"></i></div>
+          <h4>数字で見える成果設計</h4>
+          <p>感覚ではなく、GA4・広告管理ツールを使ったデータドリブンな改善方法を習得。PDCAサイクルを回せるマーケターになれます。</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4 fade-in">
+        <div class="feature-card">
+          <div class="feature-icon"><i class="bi bi-chat-dots-fill"></i></div>
+          <h4>専用コミュニティで仲間と学ぶ</h4>
+          <p>Slackコミュニティで受講生同士が繋がれます。質問はもちろん、案件紹介・コラボなど、ビジネスチャンスも生まれています。</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4 fade-in">
+        <div class="feature-card">
+          <div class="feature-icon"><i class="bi bi-shield-check-fill"></i></div>
+          <h4>30日間全額返金保証</h4>
+          <p>受講開始から30日以内なら、理由を問わず全額返金します。リスクゼロで始められるから、「合わなかったら…」という不安もなし。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- カリキュラム -->
+<section id="curriculum" style="background:#fff">
+  <div class="container">
+    <div class="text-center mb-5 fade-in">
+      <div class="section-badge">CURRICULUM</div>
+      <h2 class="section-title">8ステップで<span class="accent">プロになる</span>カリキュラム</h2>
+      <p class="section-sub">初心者でも3ヶ月でマーケティング全体を網羅できるよう設計</p>
+    </div>
+    <div class="row g-0">
+      <div class="col-lg-10 mx-auto">
+        <div class="curriculum-item fade-in">
+          <div class="curriculum-num">01</div>
+          <div>
+            <h5>Webマーケティング全体像とビジネス戦略</h5>
+            <p>カスタマージャーニー・ファネル設計・競合分析。全体を俯瞰してから個別施策へ。</p>
+            <span class="curriculum-tag">動画15本</span><span class="curriculum-tag">総復習テスト</span>
+          </div>
+        </div>
+        <div class="curriculum-item fade-in">
+          <div class="curriculum-num">02</div>
+          <div>
+            <h5>SEO完全攻略 — Googleに愛されるサイト設計</h5>
+            <p>キーワード戦略・内部SEO・外部SEO・E-E-A-T対策まで。検索上位を獲るすべてを網羅。</p>
+            <span class="curriculum-tag">動画28本</span><span class="curriculum-tag">実践課題あり</span>
+          </div>
+        </div>
+        <div class="curriculum-item fade-in">
+          <div class="curriculum-num">03</div>
+          <div>
+            <h5>コンテンツマーケティング — 読まれて売れる文章術</h5>
+            <p>ライティング・セールスコピー・ランディングページ設計。言葉で行動を生み出す技術を習得。</p>
+            <span class="curriculum-tag">動画20本</span><span class="curriculum-tag">添削フィードバック</span>
+          </div>
+        </div>
+        <div class="curriculum-item fade-in">
+          <div class="curriculum-num">04</div>
+          <div>
+            <h5>SNSマーケティング — Instagram / X / TikTok戦略</h5>
+            <p>各プラットフォームのアルゴリズム・バズるコンテンツ設計・フォロワーを顧客へ転換する方法。</p>
+            <span class="curriculum-tag">動画25本</span><span class="curriculum-tag">テンプレート配布</span>
+          </div>
+        </div>
+        <div class="curriculum-item fade-in">
+          <div class="curriculum-num">05</div>
+          <div>
+            <h5>Web広告運用 — Google広告 / Meta広告</h5>
+            <p>アカウント設計・ターゲティング・クリエイティブ制作・入札最適化・費用対効果の改善。</p>
+            <span class="curriculum-tag">動画30本</span><span class="curriculum-tag">実機演習</span>
+          </div>
+        </div>
+        <div class="curriculum-item fade-in">
+          <div class="curriculum-num">06</div>
+          <div>
+            <h5>メール・LINE マーケティング</h5>
+            <p>リスト構築・ステップメール設計・LINE公式アカウント活用。リピーター獲得の自動化を実現。</p>
+            <span class="curriculum-tag">動画18本</span><span class="curriculum-tag">シナリオ設計演習</span>
+          </div>
+        </div>
+        <div class="curriculum-item fade-in">
+          <div class="curriculum-num">07</div>
+          <div>
+            <h5>データ分析 — GA4で改善サイクルを回す</h5>
+            <p>GA4設定・レポート作成・ヒートマップ分析・A/Bテスト・データから仮説を立てる思考法。</p>
+            <span class="curriculum-tag">動画22本</span><span class="curriculum-tag">Looker Studio連携</span>
+          </div>
+        </div>
+        <div class="curriculum-item fade-in">
+          <div class="curriculum-num">08</div>
+          <div>
+            <h5>売上を仕組み化する統合マーケティング戦略</h5>
+            <p>各施策を繋げて自動で集客・育成・販売するマーケティングファネルを構築。事業に実装する最終ステップ。</p>
+            <span class="curriculum-tag">動画25本</span><span class="curriculum-tag">卒業プレゼン</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 講師紹介 -->
+<section class="instructor-section">
+  <div class="container">
+    <div class="text-center mb-5 fade-in">
+      <div class="section-badge" style="background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);border-color:rgba(255,255,255,.2)">INSTRUCTOR</div>
+      <h2 class="section-title" style="color:#fff">現役プロが<span style="color:var(--secondary)">直接教える</span></h2>
+    </div>
+    <div class="row g-5 align-items-center">
+      <div class="col-lg-5 text-center fade-in">
+        <div class="instructor-avatar mb-3" style="font-size:4rem">👨‍💼</div>
+        <h3 style="color:#fff;font-weight:900;margin-bottom:.5rem">田村 健一</h3>
+        <p style="color:rgba(255,255,255,.6);margin-bottom:1rem">デジタルマーケティングディレクター</p>
+        <div>
+          <span class="instructor-badge">Google認定パートナー</span>
+          <span class="instructor-badge">Meta広告認定</span>
+          <span class="instructor-badge">SEO歴12年</span>
+        </div>
+      </div>
+      <div class="col-lg-7 fade-in">
+        <div class="instructor-card">
+          <p style="color:rgba(255,255,255,.8);line-height:1.9;margin-bottom:2rem">
+            大手広告代理店でキャリアをスタートし、年間広告費10億円超のキャンペーンを多数担当。2015年に独立し、中小企業・スタートアップのWebマーケティング支援で累計50社以上の売上を改善。延べ受講者12,400名の実績を持つ。
+            <br><br>
+            「難しいことを誰にでもわかりやすく」をモットーに、理論だけでなく実際のビジネスで使える手法だけを厳選して教えています。
+          </p>
+          <div class="row g-3">
+            <div class="col-4"><div class="achievement"><div class="num">50社+</div><div class="lbl">支援企業数</div></div></div>
+            <div class="col-4"><div class="achievement"><div class="num">12年</div><div class="lbl">現場経験</div></div></div>
+            <div class="col-4"><div class="achievement"><div class="num">4.9点</div><div class="lbl">満足度評価</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 受講生の声 -->
+<section style="background:#f8f6ff">
+  <div class="container">
+    <div class="text-center mb-5 fade-in">
+      <div class="section-badge">TESTIMONIALS</div>
+      <h2 class="section-title">受講生の<span class="accent">リアルな声</span></h2>
+      <p class="section-sub">実際に成果を出した受講生の体験談</p>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-6 col-lg-4 fade-in">
+        <div class="testimonial-card">
+          <div class="stars">★★★★★</div>
+          <span class="result-tag green">月商 +280万円達成</span>
+          <p>「SEOとSNSを組み合わせた戦略を実践したら、3ヶ月でオーガニック流入が5倍になりました。以前は広告費だけで毎月30万円かかっていたのが、今は広告なしでも集客できています。コスト削減と売上増加が同時に実現できました。」</p>
+          <div class="author">
+            <div class="author-avatar">M</div>
+            <div><div class="author-name">松田 美咲さん</div><div class="author-title">アパレルECショップ オーナー / 34歳</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4 fade-in">
+        <div class="testimonial-card">
+          <div class="stars">★★★★★</div>
+          <span class="result-tag">転職成功・年収UP</span>
+          <p>「未経験からWebマーケターへの転職を目指し受講。卒業制作で実績を作り、面接では具体的な数字で話せるようになりました。希望の会社に内定をいただき、前職より年収が120万円アップしました！」</p>
+          <div class="author">
+            <div class="author-avatar">K</div>
+            <div><div class="author-name">小林 大輝さん</div><div class="author-title">Webマーケター（元・営業職） / 28歳</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4 fade-in">
+        <div class="testimonial-card">
+          <div class="stars">★★★★★</div>
+          <span class="result-tag blue">副業月収 +35万円</span>
+          <p>「会社員として働きながら、休日に副業としてWebマーケのコンサルを始めました。最初の3ヶ月でクライアント5社を獲得し、月収35万円の副業収入を達成。今は独立も視野に入れています。」</p>
+          <div class="author">
+            <div class="author-avatar">Y</div>
+            <div><div class="author-name">山本 裕子さん</div><div class="author-title">会社員 / Webマーケコンサルタント / 31歳</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="background:#fff;border-radius:20px;padding:2.5rem;margin-top:3rem;text-align:center" class="fade-in">
+      <div class="row g-3 justify-content-center">
+        <div class="col-6 col-md-3"><div style="font-size:2rem;font-weight:900;color:var(--primary)">93%</div><div style="color:#666;font-size:.88rem">受講後に何らかの成果を実感</div></div>
+        <div class="col-6 col-md-3"><div style="font-size:2rem;font-weight:900;color:var(--primary)">4.9 / 5</div><div style="color:#666;font-size:.88rem">総合満足度評価</div></div>
+        <div class="col-6 col-md-3"><div style="font-size:2rem;font-weight:900;color:var(--primary)">87%</div><div style="color:#666;font-size:.88rem">知人に勧めたい</div></div>
+        <div class="col-6 col-md-3"><div style="font-size:2rem;font-weight:900;color:var(--primary)">76%</div><div style="color:#666;font-size:.88rem">3ヶ月以内に成果を実感</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 料金プラン -->
+<section id="pricing" style="background:#fff">
+  <div class="container">
+    <div class="text-center mb-5 fade-in">
+      <div class="section-badge">PRICING</div>
+      <h2 class="section-title">シンプルな<span class="accent">料金プラン</span></h2>
+      <p class="section-sub">全プランに30日間返金保証付き。まずは無料体験で確認ください。</p>
+    </div>
+    <div class="row g-4 justify-content-center align-items-stretch">
+      <div class="col-md-4 fade-in">
+        <div class="pricing-card">
+          <div class="price-label">ライトプラン</div>
+          <div style="margin-bottom:1.5rem">
+            <div class="price">¥29,800<span>/月</span></div>
+            <div class="price-tax">※税込 ¥32,780</div>
+          </div>
+          <div style="color:#666;font-size:.88rem;margin-bottom:1.5rem">Webマーケの基礎を学びたい方向け</div>
+          <div class="mb-4">
+            <div class="plan-feature"><i class="bi bi-check-circle-fill"></i>全動画コンテンツ（200本+）</div>
+            <div class="plan-feature"><i class="bi bi-check-circle-fill"></i>テキスト教材・テンプレート</div>
+            <div class="plan-feature"><i class="bi bi-check-circle-fill"></i>コミュニティへの参加</div>
+            <div class="plan-feature"><i class="bi bi-x-circle-fill"></i><span style="color:#ccc">個別フィードバック</span></div>
+            <div class="plan-feature"><i class="bi bi-x-circle-fill"></i><span style="color:#ccc">週次グループ勉強会</span></div>
+            <div class="plan-feature"><i class="bi bi-x-circle-fill"></i><span style="color:#ccc">1on1コンサルセッション</span></div>
+          </div>
+          <a href="#" class="btn-plan btn-plan-outline">このプランを選ぶ</a>
+        </div>
+      </div>
+      <div class="col-md-4 fade-in">
+        <div class="pricing-card featured">
+          <div class="price-label">スタンダードプラン</div>
+          <div style="margin-bottom:1.5rem">
+            <div class="price">¥49,800<span>/月</span></div>
+            <div class="price-tax">※税込 ¥54,780</div>
+          </div>
+          <div style="color:#666;font-size:.88rem;margin-bottom:1.5rem">確実に成果を出したい方に最適</div>
+          <div class="mb-4">
+            <div class="plan-feature"><i class="bi bi-check-circle-fill"></i>全動画コンテンツ（200本+）</div>
+            <div class="plan-feature"><i class="bi bi-check-circle-fill"></i>テキスト教材・テンプレート</div>
+            <div class="plan-feature"><i class="bi bi-check-circle-fill"></i>コミュニティへの参加</div>
+            <div class="plan-feature"><i class="bi bi-check-circle-fill"></i><strong>個別フィードバック（月2回）</strong></div>
+            <div class="plan-feature"><i class="bi bi-check-circle-fill"></i><strong>週次グループ勉強会</strong></div>
+            <div class="plan-feature"><i class="bi bi-x-circle-fill"></i><span style="color:#ccc">1on1コンサルセッション</span></div>
+          </div>
+          <a href="#" class="btn-plan btn-plan-primary">このプランを選ぶ</a>
+          <div style="text-align:center;margin-top:1rem;font-size:.82rem;color:var(--primary);font-weight:700"><i class="bi bi-fire me-1"></i>受講者の68%がこのプランを選択</div>
+        </div>
+      </div>
+      <div class="col-md-4 fade-in">
+        <div class="pricing-card">
+          <div class="price-label">プレミアムプラン</div>
+          <div style="margin-bottom:1.5rem">
+            <div class="price">¥98,000<span>/月</span></div>
+            <div class="price-tax">※税込 ¥107,800</div>
+          </div>
+          <div style="color:#666;font-size:.88rem;margin-bottom:1.5rem">最速で成果を出したいビジネスオーナー向け</div>
+          <div class="mb-4">
+            <div class="plan-feature"><i class="bi bi-check-circle-fill"></i>全動画コンテンツ（200本+）</div>
+            <div class="plan-feature"><i class="bi bi-check-circle-fill"></i>テキスト教材・テンプレート</div>
+            <div class="plan-feature"><i class="bi bi-check-circle-fill"></i>コミュニティへの参加</div>
+            <div class="plan-feature"><i class="bi bi-check-circle-fill"></i>個別フィードバック（無制限）</div>
+            <div class="plan-feature"><i class="bi bi-check-circle-fill"></i>週次グループ勉強会</div>
+            <div class="plan-feature"><i class="bi bi-check-circle-fill"></i><strong>1on1コンサルセッション（月2回）</strong></div>
+          </div>
+          <a href="#" class="btn-plan btn-plan-outline">このプランを選ぶ</a>
+        </div>
+      </div>
+    </div>
+    <div class="text-center mt-4 fade-in">
+      <a href="#" style="background:linear-gradient(135deg,#f8f4ff,#f0f8ff);border:2px dashed var(--primary);border-radius:16px;padding:1.25rem 2.5rem;display:inline-block;text-decoration:none;color:var(--primary);font-weight:700">
+        <i class="bi bi-play-circle me-2"></i>まずは<span style="text-decoration:underline">無料体験レッスン</span>を受けてみる（費用一切不要）
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq" class="bg-light-custom">
+  <div class="container">
+    <div class="text-center mb-5 fade-in">
+      <div class="section-badge">FAQ</div>
+      <h2 class="section-title">よくある<span class="accent">ご質問</span></h2>
+    </div>
+    <div style="max-width:800px;margin:0 auto">
+      <div class="faq-item fade-in">
+        <div class="faq-q" onclick="toggleFaq(this)"><span>Webマーケティングの知識がゼロでも受講できますか？</span><span class="toggle bi bi-plus"></span></div>
+        <div class="faq-a">はい、まったく問題ありません。カリキュラムは「用語の意味すらわからない」という完全初心者から始められるよう設計しています。基礎から丁寧に解説し、段階的にレベルアップできます。</div>
+      </div>
+      <div class="faq-item fade-in">
+        <div class="faq-q" onclick="toggleFaq(this)"><span>スマートフォンだけで受講できますか？</span><span class="toggle bi bi-plus"></span></div>
+        <div class="faq-a">スマートフォン・タブレット・PCすべてに対応しています。ただし、実際の広告管理画面操作や分析ツールの演習については、PCでの受講を推奨しています。</div>
+      </div>
+      <div class="faq-item fade-in">
+        <div class="faq-q" onclick="toggleFaq(this)"><span>どのくらいの学習時間が必要ですか？</span><span class="toggle bi bi-plus"></span></div>
+        <div class="faq-a">1日1〜2時間の学習で、3ヶ月での修了を想定しています。すべての動画コンテンツは永久アクセス可能なので、忙しい方でも自分のペースで進められます。</div>
+      </div>
+      <div class="faq-item fade-in">
+        <div class="faq-q" onclick="toggleFaq(this)"><span>返金保証の条件を教えてください。</span><span class="toggle bi bi-plus"></span></div>
+        <div class="faq-a">受講開始日から30日以内であれば、理由を問わず全額返金いたします。手続きはメールでのご連絡のみで、難しい審査等はありません。安心してお申し込みください。</div>
+      </div>
+      <div class="faq-item fade-in">
+        <div class="faq-q" onclick="toggleFaq(this)"><span>副業・転職・ビジネス拡大、どんな目的に向いていますか？</span><span class="toggle bi bi-plus"></span></div>
+        <div class="faq-a">すべての目的に対応しています。副業でフリーランスのWebマーケターとして活動したい方、マーケ職への転職を目指す方、自社のビジネスを拡大したい経営者・事業主の方など、多様なバックグラウンドの方が受講されています。</div>
+      </div>
+      <div class="faq-item fade-in">
+        <div class="faq-q" onclick="toggleFaq(this)"><span>コンテンツはいつアップデートされますか？</span><span class="toggle bi bi-plus"></span></div>
+        <div class="faq-a">マーケティングのトレンドや各プラットフォームのアルゴリズム変更に合わせて、随時コンテンツをアップデートしています。一度購入すれば、追加費用なしで最新情報を受け取り続けられます。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 最終CTA -->
+<section class="cta-section text-center">
+  <div class="container position-relative" style="z-index:2">
+    <div class="fade-in">
+      <div class="cta-guarantee"><i class="bi bi-shield-check-fill text-success me-1"></i>30日間返金保証つき・完全リスクフリー</div>
+      <h2>今すぐ始めて、<br>3ヶ月後の<span style="color:var(--secondary)">あなた</span>を変えよう</h2>
+      <p>Webマーケティングを体系的に学び、売上・集客・キャリアの悩みを解決しましょう。<br>12,400名が証明した実績があなたをサポートします。</p>
+      <div class="d-flex gap-3 justify-content-center flex-wrap">
+        <a href="#pricing" class="btn-hero-primary" style="font-size:1.2rem;padding:1.2rem 3rem">
+          <i class="bi bi-rocket-takeoff-fill me-2"></i>今すぐ受講を始める
+        </a>
+        <a href="#" class="btn-hero-secondary" style="font-size:1.1rem">
+          <i class="bi bi-play-circle me-2"></i>無料体験を試す
+        </a>
+      </div>
+      <p style="color:rgba(255,255,255,.4);font-size:.85rem;margin-top:2rem">
+        <i class="bi bi-credit-card me-1"></i>クレジットカード・銀行振込対応&nbsp;&nbsp;
+        <i class="bi bi-lock me-1"></i>SSL暗号化で安全&nbsp;&nbsp;
+        <i class="bi bi-arrow-counterclockwise me-1"></i>30日返金保証
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- フッター -->
+<footer>
+  <div class="container">
+    <div class="row g-4 mb-4">
+      <div class="col-md-4">
+        <div class="footer-logo">WebMarketing<span>Pro</span></div>
+        <p style="font-size:.88rem;line-height:1.8;margin-bottom:1.5rem">売上を劇的に変えるWebマーケティング講座。現役プロが教える実践スキルで、あなたのビジネスを次のレベルへ。</p>
+        <div>
+          <a href="#" class="social-btn"><i class="bi bi-twitter-x"></i></a>
+          <a href="#" class="social-btn"><i class="bi bi-instagram"></i></a>
+          <a href="#" class="social-btn"><i class="bi bi-youtube"></i></a>
+          <a href="#" class="social-btn"><i class="bi bi-line"></i></a>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div style="color:rgba(255,255,255,.8);font-weight:700;margin-bottom:1rem;font-size:.9rem">コース</div>
+        <a href="#" class="footer-link">カリキュラム</a>
+        <a href="#" class="footer-link">料金プラン</a>
+        <a href="#" class="footer-link">無料体験</a>
+        <a href="#" class="footer-link">講師紹介</a>
+      </div>
+      <div class="col-md-2">
+        <div style="color:rgba(255,255,255,.8);font-weight:700;margin-bottom:1rem;font-size:.9rem">サポート</div>
+        <a href="#" class="footer-link">よくある質問</a>
+        <a href="#" class="footer-link">お問い合わせ</a>
+        <a href="#" class="footer-link">受講生の声</a>
+        <a href="#" class="footer-link">ブログ</a>
+      </div>
+      <div class="col-md-4">
+        <div style="color:rgba(255,255,255,.8);font-weight:700;margin-bottom:1rem;font-size:.9rem">無料メルマガ登録</div>
+        <p style="font-size:.85rem;color:rgba(255,255,255,.5);margin-bottom:1rem">Webマーケの最新情報を毎週お届け</p>
+        <div class="d-flex gap-2">
+          <input type="email" class="form-control" style="background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15);color:#fff;font-size:.88rem" placeholder="メールアドレスを入力">
+          <button style="background:var(--secondary);border:none;border-radius:8px;padding:.5rem 1rem;color:#fff;font-weight:700;cursor:pointer;white-space:nowrap">登録</button>
+        </div>
+      </div>
+    </div>
+    <hr class="footer-divider">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2" style="font-size:.82rem">
+      <div>&copy; 2025 WebMarketing Pro. All rights reserved.</div>
+      <div class="d-flex gap-3">
+        <a href="#">特定商取引法に基づく表示</a>
+        <a href="#">プライバシーポリシー</a>
+        <a href="#">利用規約</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// カウントダウン
+function updateCountdown(){
+  const next = new Date(); next.setDate(next.getDate()+7);
+  next.setHours(23,59,59,0);
+  const diff = next-new Date();
+  const h=Math.floor(diff/3600000),m=Math.floor((diff%3600000)/60000),s=Math.floor((diff%60000)/1000);
+  const pad=n=>String(n).padStart(2,'0');
+  const el=document.getElementById('countdown');
+  if(el) el.textContent=`${pad(h)}:${pad(m)}:${pad(s)}`;
+}
+setInterval(updateCountdown,1000); updateCountdown();
+
+// FAQ
+function toggleFaq(el){
+  const ans=el.nextElementSibling;
+  const isOpen=ans.classList.contains('open');
+  document.querySelectorAll('.faq-q').forEach(q=>{ q.classList.remove('open'); q.nextElementSibling.classList.remove('open'); });
+  if(!isOpen){ el.classList.add('open'); ans.classList.add('open'); }
+}
+
+// スクロールアニメーション
+const obs=new IntersectionObserver(entries=>{ entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); }); },{threshold:.1});
+document.querySelectorAll('.fade-in').forEach(el=>obs.observe(el));
+
+// スムーズスクロール
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    const target=document.querySelector(a.getAttribute('href'));
+    if(target){ e.preventDefault(); target.scrollIntoView({behavior:'smooth',block:'start'}); }
+  });
+});
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
