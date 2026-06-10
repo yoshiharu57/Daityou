@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>橋梁管理システム</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<style>
+:root{--primary:#1a4f8a;--primary-light:#2563aa;--accent:#e8a020}
+body{font-family:'Noto Sans JP','Meiryo',sans-serif;font-size:14px;background:#f4f7fb}
+.navbar-custom{background:linear-gradient(135deg,#0f3060,#1a4f8a);box-shadow:0 2px 8px rgba(0,0,0,.18)}
+.navbar-custom .navbar-brand,.navbar-custom .nav-link{color:#fff!important}
+.navbar-custom .nav-link:hover{color:var(--accent)!important}
+.page-header{background:linear-gradient(135deg,var(--primary),var(--primary-light));color:#fff;padding:1.5rem 0;margin-bottom:1.5rem}
+.card{border:1px solid #d0daea;border-radius:10px;box-shadow:0 2px 8px rgba(26,79,138,.08)}
+.card-header{background:linear-gradient(90deg,var(--primary),var(--primary-light));color:#fff;border-radius:10px 10px 0 0!important;font-weight:600;padding:.75rem 1.25rem}
+.table thead th{background:var(--primary);color:#fff;font-weight:600;white-space:nowrap;border:none}
+.table-hover tbody tr:hover{background:rgba(26,79,138,.06);cursor:pointer}
+.bridge-name-link{color:var(--primary);font-weight:600;text-decoration:none}
+.bridge-name-link:hover{color:var(--accent);text-decoration:underline}
+.health-badge{display:inline-block;padding:.25em .7em;border-radius:20px;font-weight:700;font-size:.85rem;min-width:2.5rem;text-align:center}
+.health-I{background:#d1fadf;color:#0a5c2f;border:1px solid #34c470}
+.health-II{background:#cff4fc;color:#055160;border:1px solid #0dcaf0}
+.health-III{background:#fff3cd;color:#664d03;border:1px solid #ffc107}
+.health-IV{background:#f8d7da;color:#58151c;border:1px solid #dc3545}
+.health-未判定,.health-未{background:#e2e3e5;color:#41464b;border:1px solid #adb5bd}
+.tab-nav{border-bottom:2px solid var(--primary)}
+.tab-nav .nav-link{color:var(--primary);font-weight:600;border:1px solid transparent;border-radius:8px 8px 0 0}
+.tab-nav .nav-link.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.tab-nav .nav-link:hover:not(.active){background:rgba(26,79,138,.08)}
+.section-title{font-size:1.05rem;font-weight:700;color:var(--primary);border-left:4px solid var(--primary);padding-left:.75rem;margin-bottom:1rem}
+.stat-card{border-radius:12px;padding:1.25rem;color:#fff;display:flex;align-items:center;gap:1rem}
+.stat-card .stat-icon{font-size:2rem;opacity:.85}
+.stat-card .stat-value{font-size:2rem;font-weight:700;line-height:1}
+.stat-card .stat-label{font-size:.82rem;opacity:.9}
+.photo-thumb{width:140px;height:105px;object-fit:cover;border-radius:8px;cursor:pointer;border:2px solid #d0daea;transition:border-color .2s,transform .2s}
+.photo-thumb:hover{border-color:var(--primary);transform:scale(1.04)}
+.photo-card{background:#fff;border:1px solid #d0daea;border-radius:10px;padding:.75rem;text-align:center}
+.photo-card:hover{box-shadow:0 4px 16px rgba(26,79,138,.15)}
+.upload-area{border:2px dashed var(--primary);border-radius:10px;padding:2rem;text-align:center;background:rgba(26,79,138,.03);cursor:pointer;transition:background .2s}
+.upload-area:hover,.upload-area.drag-over{background:rgba(26,79,138,.08)}
+.upload-area i{font-size:2.5rem;color:var(--primary)}
+.empty-state{text-align:center;padding:3rem;color:#888}
+.empty-state i{font-size:3rem;margin-bottom:1rem;color:#ccc;display:block}
+.ledger-row td:first-child{color:#666;width:35%;font-size:.85rem}
+.maps-link{color:#4285f4;text-decoration:none;font-size:.85rem}
+.maps-link:hover{text-decoration:underline}
+#app{min-height:calc(100vh - 120px)}
+.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:1040;display:flex;align-items:center;justify-content:center}
+.modal-box{background:#fff;border-radius:12px;width:90%;max-width:700px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.modal-box.modal-xl{max-width:900px}
+.modal-header-custom{background:var(--primary);color:#fff;padding:1rem 1.25rem;border-radius:12px 12px 0 0;display:flex;justify-content:space-between;align-items:center}
+.modal-header-custom .btn-close{filter:invert(1)}
+.photo-preview-modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.9);z-index:1060;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.photo-preview-modal img{max-width:95vw;max-height:80vh;object-fit:contain}
+</style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-custom">
+  <div class="container-fluid px-4">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="#" onclick="navigate('/')">
+      <i class="bi bi-building-fill-gear fs-5"></i><span>橋梁管理システム</span>
+    </a>
+    <div class="d-flex gap-2">
+      <a class="nav-link" href="#" onclick="navigate('/')"><i class="bi bi-list-ul me-1"></i>橋梁一覧</a>
+      <a class="nav-link" href="#" onclick="navigate('/bridge/new')"><i class="bi bi-plus-circle me-1"></i>橋梁登録</a>
+    </div>
+  </div>
+</nav>
+
+<div id="app"></div>
+
+<footer class="text-center py-3 border-top bg-white text-muted" style="font-size:.82rem">
+  橋梁管理システム &copy; <span id="yr"></span> | 国土交通省定期点検要領対応版 | データはブラウザに保存されます
+</footer>
+
+<script>
+document.getElementById('yr').textContent = new Date().getFullYear();
+
+// ─── 定数 ──────────────────────────────────────
+const HEALTH_LABELS = {
+  'I':   {label:'健全',       color:'health-I'},
+  'II':  {label:'予防保全段階', color:'health-II'},
+  'III': {label:'早期措置段階', color:'health-III'},
+  'IV':  {label:'緊急措置段階', color:'health-IV'},
+  '未判定':{label:'未判定',    color:'health-未判定'},
+};
+const MEMBER_TYPES = ['主桁','床版','横桁','対傾構','横構','橋脚','橋台','基礎','支承','伸縮装置','排水装置','高欄・防護柵','舗装','照明','銘板','その他'];
+const DAMAGE_TYPES = ['ひび割れ','剥離・鉄筋露出','変形・欠損','腐食','防食機能の劣化','漏水・遊離石灰','支承の機能障害','洗掘','沈下・移動・傾斜','補修・補強材の損傷','その他'];
+const STRUCTURE_TYPES = ['RC単純T桁橋','RC連続T桁橋','RC床版橋','PC単純桁橋','PC連続桁橋','鋼単純桁橋','鋼連続桁橋','ラーメン橋','アーチ橋','トラス橋','吊橋','その他'];
+const ROAD_CLASSES = ['市道','町道','村道','主要地方道','一般県道','一般都道府県道','国道','その他'];
+const MATERIALS = ['鉄筋コンクリート','プレストレストコンクリート','鋼','石','木','複合','その他'];
+const INSPECTION_TYPES = ['定期点検','緊急点検','詳細点検','初回点検'];
+const REPAIR_URGENCY = ['なし','次回点検まで経過観察','早期に補修が必要','早急に補修が必要','緊急に補修が必要'];
+const DAMAGE_RATINGS = ['a','b','c','d','e','-'];
+const PHOTO_TYPES = ['全景','橋名板','近景','損傷箇所','補修前','補修後','その他'];
+
+// ─── データストア ────────────────────────────────
+const DB = {
+  load(){
+    this.bridges = JSON.parse(localStorage.getItem('bridges_v1')||'[]');
+    this.inspections = JSON.parse(localStorage.getItem('inspections_v1')||'[]');
+    this.damages = JSON.parse(localStorage.getItem('damages_v1')||'[]');
+    if(!this.bridges.length) this.seed();
+  },
+  save(){
+    localStorage.setItem('bridges_v1', JSON.stringify(this.bridges));
+    localStorage.setItem('inspections_v1', JSON.stringify(this.inspections));
+    localStorage.setItem('damages_v1', JSON.stringify(this.damages));
+  },
+  seed(){
+    this.bridges=[
+      {id:1,management_number:'BR-001',bridge_name:'大川橋',road_name:'市道第1号線',location:'〇〇市中央区大川町1丁目',latitude:35.6762,longitude:139.6503,bridge_length:45.5,width:8.5,structure_type:'RC単純T桁橋',material:'鉄筋コンクリート',year_built:1985,road_class:'市道',administrator:'〇〇市土木課',notes:''},
+      {id:2,management_number:'BR-002',bridge_name:'新緑橋',road_name:'主要地方道15号',location:'〇〇市北区桜町2丁目',latitude:35.6895,longitude:139.6917,bridge_length:28.0,width:10.0,structure_type:'PC単純桁橋',material:'プレストレストコンクリート',year_built:1998,road_class:'主要地方道',administrator:'〇〇市土木課',notes:''},
+      {id:3,management_number:'BR-003',bridge_name:'西山歩道橋',road_name:'市道第22号線',location:'〇〇市西区山手町',latitude:35.6628,longitude:139.6312,bridge_length:15.2,width:3.5,structure_type:'鋼単純桁橋',material:'鋼',year_built:1972,road_class:'市道',administrator:'〇〇市土木課',notes:''},
+    ];
+    this.inspections=[
+      {id:1,bridge_id:1,inspection_date:'2024-06-15',inspection_type:'定期点検',inspector_company:'〇〇建設コンサルタント',inspector_name:'田中 一郎',health_rating:'II',overall_findings:'床版に軽微なひび割れが確認された。主桁に錆が発生しているが進行は緩慢。',repair_urgency:'次回点検まで経過観察',next_inspection_date:'2029-06-01'},
+      {id:2,bridge_id:2,inspection_date:'2023-10-05',inspection_type:'定期点検',inspector_company:'△△技術研究所',inspector_name:'佐藤 花子',health_rating:'I',overall_findings:'全体的に良好な状態を維持している。',repair_urgency:'なし',next_inspection_date:'2028-10-01'},
+      {id:3,bridge_id:3,inspection_date:'2022-05-20',inspection_type:'定期点検',inspector_company:'〇〇建設コンサルタント',inspector_name:'鈴木 次郎',health_rating:'III',overall_findings:'主桁に著しい腐食が確認された。早期の補修が必要。',repair_urgency:'早急に補修が必要',next_inspection_date:'2024-05-01'},
+    ];
+    this.damages=[
+      {id:1,inspection_id:1,member_type:'床版',member_number:'S1',damage_type:'ひび割れ',damage_rating:'b',damage_extent:'一部',description:'床版下面に格子状のひび割れあり',repair_method:'表面被覆工法'},
+      {id:2,inspection_id:1,member_type:'主桁',member_number:'G1',damage_type:'腐食',damage_rating:'b',damage_extent:'一部',description:'下フランジに点錆あり',repair_method:'塗装補修'},
+      {id:3,inspection_id:3,member_type:'主桁',member_number:'G1',damage_type:'腐食',damage_rating:'d',damage_extent:'全面',description:'主桁全面に著しい腐食。断面欠損を確認。',repair_method:'部材取替'},
+    ];
+    this.save();
+  },
+  nextId(arr){ return arr.length ? Math.max(...arr.map(x=>x.id))+1 : 1; },
+  getBridges(q){ return q ? this.bridges.filter(b=>[b.bridge_name,b.management_number,b.location,b.road_name].some(v=>v&&v.includes(q))) : [...this.bridges]; },
+  getBridge(id){ return this.bridges.find(b=>b.id==id); },
+  saveBridge(data){
+    if(data.id){ const i=this.bridges.findIndex(b=>b.id==data.id); if(i>=0)this.bridges[i]={...this.bridges[i],...data}; }
+    else{ data.id=this.nextId(this.bridges); this.bridges.push(data); }
+    this.save(); return data;
+  },
+  deleteBridge(id){
+    const ids=this.inspections.filter(i=>i.bridge_id==id).map(i=>i.id);
+    this.damages=this.damages.filter(d=>!ids.includes(d.inspection_id));
+    this.inspections=this.inspections.filter(i=>i.bridge_id!=id);
+    this.bridges=this.bridges.filter(b=>b.id!=id);
+    this.save();
+    // delete photos from IDB
+    PhotoStore.deleteByBridge(id);
+  },
+  getInspections(bid){ return this.inspections.filter(i=>i.bridge_id==bid).sort((a,b)=>b.inspection_date.localeCompare(a.inspection_date)); },
+  getInspection(id){ return this.inspections.find(i=>i.id==id); },
+  saveInspection(data){
+    if(data.id){ const i=this.inspections.findIndex(x=>x.id==data.id); if(i>=0)this.inspections[i]={...this.inspections[i],...data}; }
+    else{ data.id=this.nextId(this.inspections); this.inspections.push(data); }
+    this.save(); return data;
+  },
+  deleteInspection(id){
+    this.damages=this.damages.filter(d=>d.inspection_id!=id);
+    this.inspections=this.inspections.filter(i=>i.id!=id);
+    this.save();
+    PhotoStore.deleteByInspection(id);
+  },
+  getDamages(iid){ return this.damages.filter(d=>d.inspection_id==iid); },
+  saveDamage(data){ data.id=this.nextId(this.damages); this.damages.push(data); this.save(); return data; },
+  deleteDamage(id){ this.damages=this.damages.filter(d=>d.id!=id); this.save(); },
+  getLastInspection(bid){ const insps=this.getInspections(bid); return insps[0]||null; },
+};
+
+// ─── 写真ストア (IndexedDB) ──────────────────────
+const PhotoStore = {
+  db: null,
+  async init(){
+    return new Promise((res,rej)=>{
+      const req = indexedDB.open('BridgePhotoStore',1);
+      req.onupgradeneeded = e => {
+        const db = e.target.result;
+        if(!db.objectStoreNames.contains('photos')){
+          const store = db.createObjectStore('photos',{keyPath:'id',autoIncrement:true});
+          store.createIndex('inspection_id','inspection_id',{unique:false});
+          store.createIndex('bridge_id','bridge_id',{unique:false});
+        }
+      };
+      req.onsuccess = e => { this.db=e.target.result; res(); };
+      req.onerror = () => rej();
+    });
+  },
+  async add(photo){ return new Promise((res,rej)=>{ const tx=this.db.transaction('photos','readwrite'); const req=tx.objectStore('photos').add(photo); req.onsuccess=()=>res(req.result); req.onerror=()=>rej(); }); },
+  async getByInspection(iid){ return new Promise((res,rej)=>{ const tx=this.db.transaction('photos','readonly'); const req=tx.objectStore('photos').index('inspection_id').getAll(iid); req.onsuccess=()=>res(req.result); req.onerror=()=>rej(); }); },
+  async delete(id){ return new Promise((res,rej)=>{ const tx=this.db.transaction('photos','readwrite'); const req=tx.objectStore('photos').delete(id); req.onsuccess=()=>res(); req.onerror=()=>rej(); }); },
+  async deleteByInspection(iid){ const photos=await this.getByInspection(iid); for(const p of photos) await this.delete(p.id); },
+  async deleteByBridge(bid){ return new Promise((res,rej)=>{ const tx=this.db.transaction('photos','readwrite'); const req=tx.objectStore('photos').index('bridge_id').getAll(bid); req.onsuccess=async()=>{ for(const p of req.result) await this.delete(p.id); res(); }; req.onerror=()=>rej(); }); },
+  async update(id,data){ return new Promise(async(res,rej)=>{ const tx=this.db.transaction('photos','readwrite'); const store=tx.objectStore('photos'); const getReq=store.get(id); getReq.onsuccess=()=>{ const rec={...getReq.result,...data}; const putReq=store.put(rec); putReq.onsuccess=()=>res(); putReq.onerror=()=>rej(); }; getReq.onerror=()=>rej(); }); },
+};
+
+// ─── ユーティリティ ─────────────────────────────
+const fmtDate = s => { if(!s)return'—'; try{const d=new Date(s);return`${d.getFullYear()}年${d.getMonth()+1}月`;}catch{return s;} };
+const fmtDateFull = s => { if(!s)return'—'; try{const d=new Date(s);return`${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日`;}catch{return s;} };
+const mapsUrl = (lat,lng) => lat&&lng ? `https://www.google.com/maps/search/?api=1&query=${lat},${lng}` : null;
+const esc = s => (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const opt = (arr,val='',placeholder='選択') => `<option value="">${esc(placeholder)}</option>` + arr.map(v=>`<option value="${esc(v)}"${v==val?'selected':''}>${esc(v)}</option>`).join('');
+const healthBadge = r => { const h=HEALTH_LABELS[r]||HEALTH_LABELS['未判定']; return `<span class="health-badge ${h.color}">${esc(r||'未')}</span>`; };
+
+// ─── ルーター ────────────────────────────────────
+let currentRoute = '/';
+let currentState = {};
+
+function navigate(path, state={}) {
+  currentRoute = path;
+  currentState = state;
+  render();
+  window.scrollTo(0,0);
+}
+
+async function render() {
+  const app = document.getElementById('app');
+  const path = currentRoute;
+  if(path === '/') { app.innerHTML = renderBridgeList(); bindBridgeList(); }
+  else if(path === '/bridge/new') { app.innerHTML = renderBridgeForm(null); bindBridgeForm(); }
+  else if(path.match(/^\/bridge\/(\d+)$/) && !path.includes('edit')) {
+    const id = parseInt(path.match(/\/bridge\/(\d+)/)[1]);
+    app.innerHTML = renderBridgeDetail(id, currentState.tab||'ledger');
+    await bindBridgeDetail(id);
+  }
+  else if(path.match(/^\/bridge\/(\d+)\/edit$/)) {
+    const id = parseInt(path.match(/\/bridge\/(\d+)/)[1]);
+    app.innerHTML = renderBridgeForm(DB.getBridge(id));
+    bindBridgeForm();
+  }
+}
+
+// ─── 橋梁一覧 ───────────────────────────────────
+function renderBridgeList() {
+  const q = currentState.search || '';
+  const bridges = DB.getBridges(q);
+  const counts = {I:0,II:0,III:0,IV:0};
+  const rows = bridges.map(b => {
+    const insp = DB.getLastInspection(b.id);
+    const cnt = DB.getInspections(b.id).length;
+    const r = insp?.health_rating;
+    if(counts[r]!==undefined) counts[r]++;
+    const gurl = mapsUrl(b.latitude, b.longitude);
+    return `<tr onclick="navigate('/bridge/${b.id}')">
+      <td class="align-middle"><code style="font-size:.85rem">${esc(b.management_number)}</code></td>
+      <td class="align-middle"><span class="bridge-name-link"><i class="bi bi-building me-1 text-primary"></i>${esc(b.bridge_name)}</span></td>
+      <td class="align-middle text-muted" style="font-size:.88rem">${esc(b.road_name||'—')}</td>
+      <td class="align-middle" style="font-size:.88rem">${esc(b.location||'—')}</td>
+      <td class="align-middle text-center">${gurl?`<a href="${gurl}" target="_blank" class="maps-link" onclick="event.stopPropagation()"><i class="bi bi-geo-alt-fill text-danger"></i><span class="d-none d-md-inline ms-1">地図</span></a>`:'<span class="text-muted">—</span>'}</td>
+      <td class="align-middle text-center" style="font-size:.88rem">${insp?`<i class="bi bi-calendar3 me-1 text-muted"></i>${fmtDate(insp.inspection_date)}`:'<span class="text-muted">未点検</span>'}</td>
+      <td class="align-middle text-center">${healthBadge(r||'未判定')}</td>
+      <td class="align-middle text-center"><span class="badge bg-secondary rounded-pill">${cnt}</span></td>
+    </tr>`;
+  }).join('');
+
+  const statCards = [
+    {label:'管理橋梁数',val:bridges.length,icon:'bi-columns-gap',bg:'linear-gradient(135deg,#1a4f8a,#2563aa)'},
+    {label:'健全 (I)',val:counts.I,icon:'bi-shield-check',bg:'linear-gradient(135deg,#198754,#28a745)'},
+    {label:'予防保全 (II)',val:counts.II,icon:'bi-shield-check',bg:'linear-gradient(135deg,#0891b2,#0dcaf0)'},
+    {label:'早期措置 (III)',val:counts.III,icon:'bi-shield-exclamation',bg:'linear-gradient(135deg,#d97706,#ffc107)'},
+    {label:'緊急措置 (IV)',val:counts.IV,icon:'bi-shield-x',bg:'linear-gradient(135deg,#dc2626,#dc3545)'},
+  ].map(s=>`<div class="col-6 col-md"><div class="stat-card" style="background:${s.bg}"><i class="bi ${s.icon} stat-icon"></i><div><div class="stat-value">${s.val}</div><div class="stat-label">${s.label}</div></div></div></div>`).join('');
+
+  return `
+  <div class="page-header"><div class="container-fluid px-4">
+    <h4 class="mb-0"><i class="bi bi-building-fill-gear me-2"></i>橋梁台帳一覧</h4>
+    <div class="text-white-50 mt-1" style="font-size:.85rem">管理橋梁数: <strong class="text-white">${bridges.length}</strong> 件</div>
+  </div></div>
+  <div class="container-fluid px-4">
+    <div class="row g-3 mb-4">${statCards}</div>
+    <div class="card mb-3"><div class="card-body py-2">
+      <form id="searchForm" class="d-flex gap-2">
+        <div class="input-group">
+          <span class="input-group-text border-0 bg-light"><i class="bi bi-search text-muted"></i></span>
+          <input id="searchInput" type="text" class="form-control border-0 bg-light" placeholder="橋梁名・管理番号・場所で検索..." value="${esc(q)}">
+          ${q?'<button type="button" class="btn btn-light border-0" onclick="clearSearch()"><i class="bi bi-x"></i></button>':''}
+        </div>
+        <button type="submit" class="btn btn-primary px-4"><i class="bi bi-search me-1"></i>検索</button>
+        <button type="button" class="btn btn-success px-3" onclick="navigate('/bridge/new')"><i class="bi bi-plus-lg me-1"></i>新規登録</button>
+      </form>
+    </div></div>
+    <div class="card"><div class="card-body p-0">
+    ${bridges.length===0?`<div class="empty-state"><i class="bi bi-building"></i><p class="mb-2">橋梁データがありません</p><button class="btn btn-primary" onclick="navigate('/bridge/new')"><i class="bi bi-plus-lg me-1"></i>最初の橋梁を登録する</button></div>`:`
+    <div class="table-responsive"><table class="table table-hover mb-0">
+      <thead><tr><th>管理番号</th><th>橋梁名</th><th>路線名</th><th>所在地</th><th class="text-center">地図</th><th class="text-center">前回点検</th><th class="text-center">健全性</th><th class="text-center">点検数</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>`}
+    </div></div>
+    <div class="mt-3 d-flex gap-2 flex-wrap" style="font-size:.82rem">
+      ${Object.entries(HEALTH_LABELS).map(([k,v])=>`<span class="health-badge ${v.color}">${k}: ${v.label}</span>`).join('')}
+    </div>
+  </div>`;
+}
+
+function bindBridgeList(){
+  document.getElementById('searchForm')?.addEventListener('submit',e=>{e.preventDefault();currentState.search=document.getElementById('searchInput').value;render();});
+}
+function clearSearch(){ currentState.search=''; render(); }
+
+// ─── 橋梁詳細 ───────────────────────────────────
+function renderBridgeDetail(id, tab){
+  const b = DB.getBridge(id);
+  if(!b) return '<div class="container-fluid px-4 py-4">橋梁が見つかりません</div>';
+  const inspections = DB.getInspections(id);
+  const lastInsp = inspections[0]||null;
+  const health = HEALTH_LABELS[lastInsp?.health_rating]||HEALTH_LABELS['未判定'];
+  const gurl = mapsUrl(b.latitude, b.longitude);
+
+  const tabs = [
+    {key:'ledger',icon:'bi-card-list',label:'橋梁台帳'},
+    {key:'inspection',icon:'bi-clipboard2-check',label:`点検記録 (${inspections.length})`},
+    {key:'photos',icon:'bi-images',label:'写真'},
+  ];
+  const tabNav = tabs.map(t=>`<li class="nav-item"><button class="nav-link ${tab===t.key?'active':''}" onclick="navigate('/bridge/${id}',{tab:'${t.key}'})"><i class="bi ${t.icon} me-1"></i>${t.label}</button></li>`).join('');
+
+  let content = '';
+  if(tab==='ledger') content = renderLedger(b, lastInsp, inspections.length);
+  else if(tab==='inspection') content = renderInspectionTab(b, inspections);
+  else if(tab==='photos') content = renderPhotosTab(b, inspections);
+
+  return `
+  <div class="page-header"><div class="container-fluid px-4">
+    <nav aria-label="breadcrumb" class="mb-2">
+      <ol class="breadcrumb mb-0" style="font-size:.85rem">
+        <li class="breadcrumb-item"><a href="#" onclick="navigate('/')" class="text-white-50 text-decoration-none">橋梁一覧</a></li>
+        <li class="breadcrumb-item active text-white">${esc(b.bridge_name)}</li>
+      </ol>
+    </nav>
+    <div class="d-flex align-items-start justify-content-between flex-wrap gap-2">
+      <div>
+        <h4 class="mb-1"><i class="bi bi-building me-2"></i>${esc(b.bridge_name)}</h4>
+        <div class="d-flex gap-3 flex-wrap" style="font-size:.88rem">
+          <code class="text-white bg-transparent">${esc(b.management_number)}</code>
+          ${b.road_name?`<span class="text-white-50"><i class="bi bi-signpost me-1"></i>${esc(b.road_name)}</span>`:''}
+          ${b.location?`<span class="text-white-50"><i class="bi bi-geo me-1"></i>${esc(b.location)}</span>`:''}
+          ${gurl?`<a href="${gurl}" target="_blank" class="text-warning text-decoration-none"><i class="bi bi-geo-alt-fill me-1"></i>Google Mapで見る</a>`:''}
+        </div>
+      </div>
+      <div class="d-flex gap-2 align-items-center">
+        <span class="health-badge ${health.color} px-3 py-1" style="font-size:1.1rem">健全性 ${esc(lastInsp?.health_rating||'未判定')}</span>
+        <button class="btn btn-warning btn-sm" onclick="navigate('/bridge/${id}/edit')"><i class="bi bi-pencil me-1"></i>編集</button>
+        <button class="btn btn-danger btn-sm" onclick="confirmDeleteBridge(${id},'${esc(b.bridge_name)}')"><i class="bi bi-trash me-1"></i>削除</button>
+      </div>
+    </div>
+  </div></div>
+  <div class="container-fluid px-4">
+    <ul class="nav tab-nav mb-4">${tabNav}</ul>
+    ${content}
+  </div>`;
+}
+
+function renderLedger(b, lastInsp, inspCount){
+  const health = HEALTH_LABELS[lastInsp?.health_rating]||HEALTH_LABELS['未判定'];
+  const age = b.year_built ? new Date().getFullYear()-b.year_built : null;
+  const gurl = mapsUrl(b.latitude, b.longitude);
+  const row = (label,val,extra='') => `<tr class="ledger-row"><td>${label}</td><td>${val||'<span class="text-muted">—</span>'}${extra}</td></tr>`;
+  return `
+  <div class="row g-3">
+    <div class="col-lg-8"><div class="card h-100">
+      <div class="card-header"><i class="bi bi-card-list me-2"></i>橋梁台帳</div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <p class="section-title">識別情報</p>
+            <table class="table table-sm table-borderless">${row('管理番号',`<code>${esc(b.management_number)}</code>`)+row('橋梁名',esc(b.bridge_name))+row('路線名',esc(b.road_name))+row('道路種別',esc(b.road_class))+row('管理者',esc(b.administrator))}</table>
+          </div>
+          <div class="col-md-6">
+            <p class="section-title">所在地</p>
+            <table class="table table-sm table-borderless">${row('所在地',esc(b.location))+row('位置情報',b.latitude&&b.longitude?`<span class="text-muted" style="font-size:.85rem">${b.latitude}, ${b.longitude}</span>${gurl?`<br><a href="${gurl}" target="_blank" class="maps-link"><i class="bi bi-geo-alt-fill text-danger me-1"></i>Google Mapで確認</a>`:''}` : '')}</table>
+          </div>
+        </div>
+        <hr>
+        <div class="row">
+          <div class="col-md-6">
+            <p class="section-title">構造諸元</p>
+            <table class="table table-sm table-borderless">${row('構造形式',esc(b.structure_type))+row('材料',esc(b.material))+row('橋長',b.bridge_length?b.bridge_length+' m':'')+row('幅員',b.width?b.width+' m':'')}</table>
+          </div>
+          <div class="col-md-6">
+            <p class="section-title">建設・点検情報</p>
+            <table class="table table-sm table-borderless">${row('建設年次',b.year_built?b.year_built+'年'+(age?` <small class="text-muted">（築${age}年）</small>`:''):'')+row('前回点検年月',fmtDate(lastInsp?.inspection_date))+row('健全性区分',lastInsp?`<span class="health-badge ${health.color}">${esc(lastInsp.health_rating||'未判定')}: ${health.label}</span>`:'<span class="text-muted">未点検</span>')}</table>
+          </div>
+        </div>
+        ${b.notes?`<hr><p class="section-title">備考</p><p class="text-muted mb-0" style="white-space:pre-wrap;font-size:.92rem">${esc(b.notes)}</p>`:''}
+      </div>
+    </div></div>
+    <div class="col-lg-4">
+      <div class="card mb-3">
+        <div class="card-header"><i class="bi bi-clipboard2-check me-2"></i>最新点検情報</div>
+        <div class="card-body">
+          ${lastInsp?`
+          <div class="text-center mb-3">
+            <div class="health-badge ${health.color} px-4 py-2" style="font-size:1.1rem">健全性 ${esc(lastInsp.health_rating||'未判定')}</div>
+            <div class="text-muted mt-1" style="font-size:.82rem">${health.label}</div>
+          </div>
+          <table class="table table-sm table-borderless mb-0">
+            <tr><td class="text-muted">点検年月日</td><td>${fmtDateFull(lastInsp.inspection_date)}</td></tr>
+            <tr><td class="text-muted">点検種別</td><td>${esc(lastInsp.inspection_type||'—')}</td></tr>
+            <tr><td class="text-muted">点検業者</td><td>${esc(lastInsp.inspector_company||'—')}</td></tr>
+            <tr><td class="text-muted">点検者</td><td>${esc(lastInsp.inspector_name||'—')}</td></tr>
+            ${lastInsp.repair_urgency?`<tr><td class="text-muted">補修緊急度</td><td class="${lastInsp.repair_urgency!=='なし'?'text-danger fw-semibold':''}">${esc(lastInsp.repair_urgency)}</td></tr>`:''}
+          </table>
+          ${lastInsp.overall_findings?`<div class="mt-3 p-2 bg-light rounded" style="font-size:.85rem"><strong>所見:</strong><p class="mb-0 mt-1 text-muted" style="white-space:pre-wrap">${esc(lastInsp.overall_findings)}</p></div>`:''}
+          `:`<div class="empty-state py-3"><i class="bi bi-clipboard2 fs-2 text-muted mb-2"></i><p class="mb-0 text-muted">点検記録がありません</p></div>`}
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><i class="bi bi-graph-up me-2"></i>諸元サマリ</div>
+        <div class="card-body p-0">
+          <table class="table table-sm mb-0">
+            <tr><td class="text-muted ps-3">橋長</td><td class="text-end pe-3">${b.bridge_length?b.bridge_length+' m':'—'}</td></tr>
+            <tr><td class="text-muted ps-3">幅員</td><td class="text-end pe-3">${b.width?b.width+' m':'—'}</td></tr>
+            <tr><td class="text-muted ps-3">構造形式</td><td class="text-end pe-3">${esc(b.structure_type||'—')}</td></tr>
+            <tr><td class="text-muted ps-3">材料</td><td class="text-end pe-3">${esc(b.material||'—')}</td></tr>
+            <tr><td class="text-muted ps-3">建設年</td><td class="text-end pe-3">${b.year_built?b.year_built+'年':'—'}</td></tr>
+            <tr><td class="text-muted ps-3">橋齢</td><td class="text-end pe-3">${age!==null?age+'年':'—'}</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ─── 点検記録タブ ───────────────────────────────
+function renderInspectionTab(b, inspections){
+  const selected = currentState.selectedInspection || (inspections[0]?.id);
+  const insp = inspections.find(i=>i.id==selected)||inspections[0];
+  const listItems = inspections.map(i=>{
+    const h=HEALTH_LABELS[i.health_rating]||HEALTH_LABELS['未判定'];
+    const isActive = i.id == (insp?.id);
+    return `<button class="list-group-item list-group-item-action ${isActive?'active':''}" onclick="selectInspection(${b.id},${i.id})" style="border-left:4px solid ${isActive?'var(--primary)':'transparent'}">
+      <div class="d-flex justify-content-between align-items-start">
+        <div><div class="fw-semibold" style="font-size:.9rem">${fmtDateFull(i.inspection_date)}</div>
+        <div class="text-muted" style="font-size:.8rem">${esc(i.inspection_type)}</div></div>
+        <span class="health-badge ${h.color}">${esc(i.health_rating||'未')}</span>
+      </div>
+      ${i.inspector_company?`<div class="text-muted mt-1" style="font-size:.78rem"><i class="bi bi-building me-1"></i>${esc(i.inspector_company)}</div>`:''}
+    </button>`;
+  }).join('');
+  const detail = insp ? renderInspectionDetail(b, insp) : '<div class="empty-state"><i class="bi bi-hand-index"></i><p class="text-muted">点検記録を選択してください</p></div>';
+  return `
+  <div class="row g-3">
+    <div class="col-lg-4">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h6 class="mb-0 text-primary fw-bold"><i class="bi bi-list-check me-1"></i>点検記録一覧</h6>
+        <button class="btn btn-sm btn-primary" onclick="showInspectionForm(${b.id},null)"><i class="bi bi-plus-lg me-1"></i>追加</button>
+      </div>
+      ${inspections.length===0?'<div class="empty-state py-4"><i class="bi bi-clipboard2 fs-2 text-muted d-block mb-2"></i><p class="text-muted mb-0">点検記録がありません</p></div>':
+      `<div class="list-group">${listItems}</div>`}
+    </div>
+    <div class="col-lg-8" id="inspDetailArea">${detail}</div>
+  </div>`;
+}
+
+function renderInspectionDetail(b, insp){
+  const health = HEALTH_LABELS[insp.health_rating]||HEALTH_LABELS['未判定'];
+  const damages = DB.getDamages(insp.id);
+  const damageRows = damages.map(d=>`<tr>
+    <td>${esc(d.member_type||'—')}</td><td>${esc(d.member_number||'—')}</td><td>${esc(d.damage_type||'—')}</td>
+    <td class="text-center"><span class="badge bg-warning text-dark">${esc(d.damage_rating||'—')}</span></td>
+    <td>${esc(d.description||'—')}</td><td>${esc(d.repair_method||'—')}</td>
+    <td><button class="btn btn-link text-danger p-0" onclick="deleteDamage(${insp.id},${d.id})" style="font-size:.8rem"><i class="bi bi-trash"></i></button></td>
+  </tr>`).join('');
+  return `
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <span><i class="bi bi-clipboard2-check me-2"></i>${fmtDateFull(insp.inspection_date)} 点検詳細</span>
+      <div class="d-flex gap-1">
+        <button class="btn btn-sm btn-warning" onclick="showInspectionForm(${b.id},${insp.id})"><i class="bi bi-pencil"></i></button>
+        <button class="btn btn-sm btn-danger" onclick="confirmDeleteInspection(${insp.id})"><i class="bi bi-trash"></i></button>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="row g-3 mb-3 text-center">
+        <div class="col-sm-4"><div class="text-muted" style="font-size:.8rem">健全性区分</div><span class="health-badge ${health.color} px-3">${esc(insp.health_rating||'未判定')}</span></div>
+        <div class="col-sm-4"><div class="text-muted" style="font-size:.8rem">点検種別</div><div class="fw-semibold">${esc(insp.inspection_type)}</div></div>
+        <div class="col-sm-4"><div class="text-muted" style="font-size:.8rem">補修緊急度</div><div class="fw-semibold ${insp.repair_urgency&&insp.repair_urgency!=='なし'?'text-danger':''}">${esc(insp.repair_urgency||'—')}</div></div>
+      </div>
+      <table class="table table-sm table-borderless mb-3">
+        <tr><td class="text-muted" style="width:35%">点検業者</td><td>${esc(insp.inspector_company||'—')}</td></tr>
+        <tr><td class="text-muted">点検者</td><td>${esc(insp.inspector_name||'—')}</td></tr>
+        ${insp.next_inspection_date?`<tr><td class="text-muted">次回点検予定</td><td>${fmtDateFull(insp.next_inspection_date)}</td></tr>`:''}
+      </table>
+      ${insp.overall_findings?`<div class="mb-3"><p class="section-title">総括所見</p><div class="p-3 bg-light rounded" style="font-size:.9rem;white-space:pre-wrap">${esc(insp.overall_findings)}</div></div>`:''}
+      <div>
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <p class="section-title mb-0">損傷記録</p>
+          <button class="btn btn-sm btn-outline-primary" onclick="showDamageForm(${insp.id})"><i class="bi bi-plus me-1"></i>損傷追加</button>
+        </div>
+        ${damages.length>0?`<div class="table-responsive"><table class="table table-sm table-bordered mb-0" style="font-size:.82rem">
+          <thead><tr><th>部材種別</th><th>番号</th><th>損傷種別</th><th class="text-center">程度</th><th>説明</th><th>補修方法</th><th></th></tr></thead>
+          <tbody>${damageRows}</tbody>
+        </table></div>`:'<div class="text-muted text-center py-3" style="font-size:.88rem">損傷記録がありません</div>'}
+      </div>
+    </div>
+  </div>`;
+}
+
+function selectInspection(bid, iid){ currentState.selectedInspection=iid; navigate(`/bridge/${bid}`,{tab:'inspection',selectedInspection:iid}); }
+
+// ─── 写真タブ ────────────────────────────────────
+function renderPhotosTab(b, inspections){
+  const selId = currentState.selectedPhotoInspection || (inspections[0]?.id);
+  const listItems = inspections.map(i=>{
+    const isActive = i.id == selId;
+    return `<button class="list-group-item list-group-item-action ${isActive?'active':''}" onclick="selectPhotoInspection(${b.id},${i.id})" style="border-left:4px solid ${isActive?'var(--primary)':'transparent'}">
+      <div class="fw-semibold" style="font-size:.88rem">${fmtDateFull(i.inspection_date)}</div>
+      <div class="text-muted" style="font-size:.78rem">${esc(i.inspection_type)}</div>
+    </button>`;
+  }).join('');
+  return `
+  <div class="row g-3">
+    <div class="col-lg-3">
+      <h6 class="mb-2 text-primary fw-bold"><i class="bi bi-calendar3 me-1"></i>点検を選択</h6>
+      ${inspections.length===0?'<div class="text-muted text-center py-3" style="font-size:.88rem">点検記録がありません</div>':`<div class="list-group">${listItems}</div>`}
+    </div>
+    <div class="col-lg-9" id="photoGalleryArea">
+      ${selId?'<div class="text-center py-4"><div class="spinner-border text-primary"></div></div>':'<div class="empty-state"><i class="bi bi-hand-index"></i><p class="text-muted">左から点検を選択してください</p></div>'}
+    </div>
+  </div>`;
+}
+
+async function loadPhotoGallery(bid, iid){
+  const area = document.getElementById('photoGalleryArea');
+  if(!area||!iid) return;
+  const insp = DB.getInspection(iid);
+  if(!insp) return;
+  const photos = await PhotoStore.getByInspection(iid);
+  const filterVal = currentState.photoFilter||'';
+  const filtered = filterVal ? photos.filter(p=>p.photo_type===filterVal||p.member_type===filterVal) : photos;
+  const cards = filtered.map(p=>{
+    const url = URL.createObjectURL(new Blob([p.data],{type:p.mime||'image/jpeg'}));
+    const isPdf = p.original_filename?.toLowerCase().endsWith('.pdf')||p.mime==='application/pdf';
+    return `<div class="col-6 col-md-4 col-lg-3">
+      <div class="photo-card">
+        <div class="position-relative">
+          ${isPdf?`<div class="photo-thumb d-flex flex-column align-items-center justify-content-center bg-light w-100 mx-auto" onclick="previewPhoto('${url}',true,'${esc(p.original_filename||'')}')"><i class="bi bi-file-pdf text-danger fs-2"></i><small class="text-muted text-center" style="font-size:.7rem;padding:0 4px;word-break:break-all">${esc(p.original_filename||p.id)}</small></div>`
+          :`<img src="${url}" class="photo-thumb w-100" onclick="previewPhoto('${url}',false,'${esc(p.caption||p.original_filename||'')}')" alt="${esc(p.caption||'')}">`}
+          <button class="btn btn-danger btn-sm position-absolute top-0 end-0 p-0" style="width:22px;height:22px;font-size:.7rem;line-height:1;opacity:.85" onclick="deletePhoto(${p.id},${bid},${iid})"><i class="bi bi-x"></i></button>
+        </div>
+        <div style="font-size:.78rem;color:#555;margin-top:.4rem;word-break:break-all">
+          ${p.photo_type?`<span class="badge bg-primary me-1" style="font-size:.65rem">${esc(p.photo_type)}</span>`:''}
+          ${p.member_type?`<span class="badge bg-secondary me-1" style="font-size:.65rem">${esc(p.member_type)}</span>`:''}
+          ${p.caption?`<div class="mt-1">${esc(p.caption)}</div>`:(!p.photo_type&&!p.member_type?`<span class="text-muted">${esc(p.original_filename||'')}</span>`:'')}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const filterOpts = `<option value="">すべて表示</option><optgroup label="写真区分">${PHOTO_TYPES.map(t=>`<option value="${esc(t)}"${t===filterVal?'selected':''}>${esc(t)}</option>`).join('')}</optgroup><optgroup label="部材種別">${MEMBER_TYPES.map(m=>`<option value="${esc(m)}"${m===filterVal?'selected':''}>${esc(m)}</option>`).join('')}</optgroup>`;
+  area.innerHTML = `
+  <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <div class="d-flex align-items-center gap-2">
+      <h6 class="mb-0 text-primary fw-bold"><i class="bi bi-images me-1"></i>${fmtDateFull(insp.inspection_date)}の写真</h6>
+      <span class="badge bg-secondary rounded-pill">${photos.length}枚</span>
+    </div>
+    <div class="d-flex gap-2">
+      <select class="form-select form-select-sm" style="width:auto" onchange="changePhotoFilter(${bid},${iid},this.value)">${filterOpts}</select>
+      <button class="btn btn-primary btn-sm" onclick="showPhotoUpload(${bid},${iid})"><i class="bi bi-cloud-upload me-1"></i>写真追加</button>
+    </div>
+  </div>
+  ${filtered.length===0?`<div class="empty-state"><i class="bi bi-camera"></i><p class="text-muted mb-2">写真がありません</p><button class="btn btn-outline-primary btn-sm" onclick="showPhotoUpload(${bid},${iid})"><i class="bi bi-cloud-upload me-1"></i>写真をアップロード</button></div>`:`<div class="row g-3">${cards}</div>`}`;
+}
+
+function selectPhotoInspection(bid,iid){ currentState.selectedPhotoInspection=iid; navigate(`/bridge/${bid}`,{tab:'photos',selectedPhotoInspection:iid}); }
+function changePhotoFilter(bid,iid,val){ currentState.photoFilter=val; loadPhotoGallery(bid,iid); }
+
+// ─── 橋梁フォーム ────────────────────────────────
+function renderBridgeForm(b){
+  const v = b||{};
+  const title = b?'橋梁情報編集':'橋梁新規登録';
+  const f = (name,label,ph,type='text',required='') => `<div class="mb-3">
+    <label class="form-label fw-semibold">${label}${required?'<span class="text-danger ms-1">*</span>':''}</label>
+    <input type="${type}" class="form-control" name="${name}" value="${esc(v[name]??'')}" placeholder="${ph}"${required?' required':''}>
+  </div>`;
+  const s = (name,label,arr,ph='選択') => `<div class="mb-3">
+    <label class="form-label fw-semibold">${label}</label>
+    <select class="form-select" name="${name}">${opt(arr,v[name],ph)}</select>
+  </div>`;
+  return `
+  <div class="page-header"><div class="container-fluid px-4">
+    <nav aria-label="breadcrumb" class="mb-2"><ol class="breadcrumb mb-0" style="font-size:.85rem">
+      <li class="breadcrumb-item"><a href="#" onclick="navigate('/')" class="text-white-50 text-decoration-none">橋梁一覧</a></li>
+      ${b?`<li class="breadcrumb-item"><a href="#" onclick="navigate('/bridge/${b.id}')" class="text-white-50 text-decoration-none">橋梁詳細</a></li>`:''}
+      <li class="breadcrumb-item active text-white">${title}</li>
+    </ol></nav>
+    <h4 class="mb-0"><i class="bi ${b?'bi-pencil':'bi-plus-circle'} me-2"></i>${title}</h4>
+  </div></div>
+  <div class="container-fluid px-4">
+    <div id="formError" class="alert alert-danger d-none"></div>
+    <form id="bridgeForm">
+      ${b?`<input type="hidden" name="id" value="${b.id}">`:''}
+      <div class="card mb-3"><div class="card-header"><i class="bi bi-info-circle me-2"></i>基本情報</div><div class="card-body">
+        <div class="row"><div class="col-md-4">${f('management_number','管理番号','例: BR-001','text',true)}</div><div class="col-md-8">${f('bridge_name','橋梁名','例: 大川橋','text',true)}</div></div>
+        <div class="row"><div class="col-md-6">${f('road_name','路線名','例: 市道第1号線')}</div><div class="col-md-3">${s('road_class','道路種別',ROAD_CLASSES)}</div><div class="col-md-3">${f('administrator','管理者','例: 〇〇市土木課')}</div></div>
+        ${f('location','所在地','例: 〇〇市中央区大川町1丁目')}
+        <div class="row"><div class="col-md-3">${f('latitude','緯度 (Google Map用)','例: 35.6762','number')}</div><div class="col-md-3">${f('longitude','経度','例: 139.6503','number')}</div></div>
+      </div></div>
+      <div class="card mb-3"><div class="card-header"><i class="bi bi-rulers me-2"></i>構造諸元</div><div class="card-body">
+        <div class="row"><div class="col-md-4">${s('structure_type','構造形式',STRUCTURE_TYPES)}</div><div class="col-md-4">${s('material','材料',MATERIALS)}</div><div class="col-md-4">${f('year_built','建設年次','例: 1985','number')}</div></div>
+        <div class="row"><div class="col-md-3">${f('bridge_length','橋長 (m)','例: 45.5','number')}</div><div class="col-md-3">${f('width','幅員 (m)','例: 8.5','number')}</div></div>
+      </div></div>
+      <div class="card mb-4"><div class="card-header"><i class="bi bi-chat-text me-2"></i>備考</div><div class="card-body">
+        <textarea class="form-control" name="notes" rows="3" placeholder="特記事項">${esc(v.notes||'')}</textarea>
+      </div></div>
+      <div class="d-flex gap-2 mb-5">
+        <button type="submit" class="btn btn-primary px-4"><i class="bi bi-check-lg me-1"></i>${b?'更新する':'登録する'}</button>
+        <button type="button" class="btn btn-outline-secondary px-4" onclick="navigate('${b?`/bridge/${b.id}`:'/'}')""><i class="bi bi-x-lg me-1"></i>キャンセル</button>
+      </div>
+    </form>
+  </div>`;
+}
+
+function bindBridgeForm(){
+  document.getElementById('bridgeForm')?.addEventListener('submit', e=>{
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const data = Object.fromEntries(fd.entries());
+    ['latitude','longitude','bridge_length','width','year_built'].forEach(k=>{ if(data[k]!=='') data[k]=parseFloat(data[k]); else data[k]=null; });
+    const err = document.getElementById('formError');
+    if(!data.management_number||!data.bridge_name){ err.textContent='管理番号と橋梁名は必須です'; err.classList.remove('d-none'); return; }
+    if(!data.id) { const dup=DB.bridges.find(b=>b.management_number===data.management_number); if(dup){err.textContent='この管理番号はすでに登録されています';err.classList.remove('d-none');return;} }
+    err.classList.add('d-none');
+    const saved = DB.saveBridge(data);
+    navigate(`/bridge/${saved.id}`);
+  });
+}
+
+// ─── 点検フォームモーダル ────────────────────────
+function showInspectionForm(bid, iid){
+  const insp = iid ? DB.getInspection(iid) : null;
+  const v = insp||{inspection_type:'定期点検',health_rating:'未判定',repair_urgency:'なし'};
+  const sel = (name,arr,placeholder='選択') => `<select class="form-select" name="${name}">${opt(arr,v[name],placeholder)}</select>`;
+  showModal(`<div class="modal-header-custom"><h5 class="mb-0"><i class="bi bi-clipboard2-plus me-2"></i>${iid?'点検記録を編集':'点検記録を新規追加'}</h5><button class="btn-close" onclick="closeModal()"></button></div>
+  <div class="p-3">
+  <form id="inspForm">
+    ${iid?`<input type="hidden" name="id" value="${iid}">`:`<input type="hidden" name="bridge_id" value="${bid}">`}
+    <div class="row g-3">
+      <div class="col-md-3"><label class="form-label fw-semibold">点検年月日 <span class="text-danger">*</span></label><input type="date" class="form-control" name="inspection_date" value="${esc(v.inspection_date||'')}" required></div>
+      <div class="col-md-3"><label class="form-label fw-semibold">点検種別</label>${sel('inspection_type',INSPECTION_TYPES)}</div>
+      <div class="col-md-3"><label class="form-label fw-semibold">健全性区分</label><select class="form-select" name="health_rating">${Object.entries(HEALTH_LABELS).map(([k,h])=>`<option value="${k}"${k==v.health_rating?'selected':''}>${k}: ${h.label}</option>`).join('')}</select></div>
+      <div class="col-md-3"><label class="form-label fw-semibold">補修緊急度</label>${sel('repair_urgency',REPAIR_URGENCY)}</div>
+      <div class="col-md-5"><label class="form-label fw-semibold">点検業者</label><input type="text" class="form-control" name="inspector_company" value="${esc(v.inspector_company||'')}" placeholder="会社名"></div>
+      <div class="col-md-4"><label class="form-label fw-semibold">点検者</label><input type="text" class="form-control" name="inspector_name" value="${esc(v.inspector_name||'')}" placeholder="担当者名"></div>
+      <div class="col-md-3"><label class="form-label fw-semibold">次回点検予定</label><input type="date" class="form-control" name="next_inspection_date" value="${esc(v.next_inspection_date||'')}"></div>
+      <div class="col-12"><label class="form-label fw-semibold">総括所見</label><textarea class="form-control" name="overall_findings" rows="4" placeholder="点検の総括所見...">${esc(v.overall_findings||'')}</textarea></div>
+    </div>
+    <div class="d-flex gap-2 mt-3">
+      <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg me-1"></i>保存</button>
+      <button type="button" class="btn btn-outline-secondary" onclick="closeModal()"><i class="bi bi-x-lg me-1"></i>キャンセル</button>
+    </div>
+  </form></div>`);
+  document.getElementById('inspForm')?.addEventListener('submit', e=>{
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const data = Object.fromEntries(fd.entries());
+    if(!data.id) data.bridge_id = parseInt(data.bridge_id);
+    else data.id = parseInt(data.id);
+    if(!data.next_inspection_date) data.next_inspection_date = null;
+    const saved = DB.saveInspection(data);
+    closeModal();
+    navigate(`/bridge/${bid}`,{tab:'inspection',selectedInspection:saved.id});
+  });
+}
+
+// ─── 損傷フォームモーダル ────────────────────────
+function showDamageForm(iid){
+  const insp = DB.getInspection(iid);
+  showModal(`<div class="modal-header-custom"><h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i>損傷記録を追加</h5><button class="btn-close" onclick="closeModal()"></button></div>
+  <div class="p-3"><form id="dmgForm">
+    <div class="row g-2">
+      <div class="col-md-4"><label class="form-label fw-semibold" style="font-size:.85rem">部材種別</label><select class="form-select form-select-sm" name="member_type"><option value="">選択</option>${MEMBER_TYPES.map(m=>`<option>${esc(m)}</option>`).join('')}</select></div>
+      <div class="col-md-2"><label class="form-label fw-semibold" style="font-size:.85rem">部材番号</label><input class="form-control form-control-sm" name="member_number" placeholder="G1,P1..."></div>
+      <div class="col-md-4"><label class="form-label fw-semibold" style="font-size:.85rem">損傷種別</label><select class="form-select form-select-sm" name="damage_type"><option value="">選択</option>${DAMAGE_TYPES.map(d=>`<option>${esc(d)}</option>`).join('')}</select></div>
+      <div class="col-md-2"><label class="form-label fw-semibold" style="font-size:.85rem">損傷程度</label><select class="form-select form-select-sm" name="damage_rating">${DAMAGE_RATINGS.map(r=>`<option>${r}</option>`).join('')}</select></div>
+      <div class="col-md-3"><label class="form-label fw-semibold" style="font-size:.85rem">損傷量</label><input class="form-control form-control-sm" name="damage_extent" placeholder="全面、一部..."></div>
+      <div class="col-md-5"><label class="form-label fw-semibold" style="font-size:.85rem">損傷の説明</label><input class="form-control form-control-sm" name="description" placeholder="損傷の状況"></div>
+      <div class="col-md-4"><label class="form-label fw-semibold" style="font-size:.85rem">補修方法</label><input class="form-control form-control-sm" name="repair_method" placeholder="推奨補修方法"></div>
+    </div>
+    <div class="d-flex gap-2 mt-3">
+      <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-plus me-1"></i>追加</button>
+      <button type="button" class="btn btn-outline-secondary btn-sm" onclick="closeModal()">キャンセル</button>
+    </div>
+  </form></div>`);
+  document.getElementById('dmgForm')?.addEventListener('submit', e=>{
+    e.preventDefault();
+    const fd = new FormData(e.target); const data = Object.fromEntries(fd.entries());
+    data.inspection_id = iid;
+    DB.saveDamage(data);
+    closeModal();
+    navigate(`/bridge/${insp.bridge_id}`,{tab:'inspection',selectedInspection:iid});
+  });
+}
+
+// ─── 写真アップロードモーダル ─────────────────────
+let _uploadFiles = [];
+function showPhotoUpload(bid, iid){
+  _uploadFiles = [];
+  showModal(`<div class="modal-header-custom"><h5 class="mb-0"><i class="bi bi-cloud-upload me-2"></i>写真アップロード</h5><button class="btn-close" onclick="closeModal()"></button></div>
+  <div class="p-3">
+    <div class="upload-area mb-3" id="dropArea" onclick="document.getElementById('photoFileInput').click()">
+      <i class="bi bi-cloud-arrow-up"></i>
+      <p class="mt-2 mb-1 fw-semibold">ここにドラッグ＆ドロップ</p>
+      <p class="text-muted mb-0" style="font-size:.85rem">またはクリックしてファイルを選択（JPG・PNG・PDF対応）</p>
+      <input id="photoFileInput" type="file" multiple accept="image/*,.pdf" class="d-none" onchange="addUploadFiles(event)">
+    </div>
+    <div id="previewArea" class="d-flex flex-wrap gap-2 mb-3"></div>
+    <div class="row g-2">
+      <div class="col-md-4"><label class="form-label fw-semibold" style="font-size:.85rem">写真区分</label><select id="upPhotoType" class="form-select form-select-sm"><option value="">選択</option>${PHOTO_TYPES.map(t=>`<option>${esc(t)}</option>`).join('')}</select></div>
+      <div class="col-md-4"><label class="form-label fw-semibold" style="font-size:.85rem">対象部材</label><select id="upMemberType" class="form-select form-select-sm"><option value="">選択</option>${MEMBER_TYPES.map(m=>`<option>${esc(m)}</option>`).join('')}</select></div>
+      <div class="col-md-4"><label class="form-label fw-semibold" style="font-size:.85rem">損傷種別</label><select id="upDamageType" class="form-select form-select-sm"><option value="">選択</option>${DAMAGE_TYPES.map(d=>`<option>${esc(d)}</option>`).join('')}</select></div>
+      <div class="col-12"><label class="form-label fw-semibold" style="font-size:.85rem">キャプション</label><input id="upCaption" type="text" class="form-control form-control-sm" placeholder="写真の説明（省略可）"></div>
+    </div>
+    <div class="d-flex gap-2 mt-3">
+      <button id="uploadBtn" class="btn btn-primary" onclick="doUpload(${bid},${iid})" disabled><i class="bi bi-cloud-upload me-1"></i>アップロード</button>
+      <button class="btn btn-outline-secondary" onclick="closeModal()">キャンセル</button>
+    </div>
+  </div>`, 'modal-xl');
+  setupDropArea();
+}
+
+function setupDropArea(){
+  const da = document.getElementById('dropArea');
+  if(!da) return;
+  da.addEventListener('dragover',e=>{e.preventDefault();da.classList.add('drag-over');});
+  da.addEventListener('dragleave',()=>da.classList.remove('drag-over'));
+  da.addEventListener('drop',e=>{e.preventDefault();da.classList.remove('drag-over');addFiles(Array.from(e.dataTransfer.files));});
+}
+function addUploadFiles(e){ addFiles(Array.from(e.target.files)); }
+function addFiles(files){
+  const valid = files.filter(f=>f.type.startsWith('image/')||f.type==='application/pdf');
+  _uploadFiles.push(...valid);
+  renderPreview();
+  const btn = document.getElementById('uploadBtn');
+  if(btn) btn.disabled = _uploadFiles.length===0;
+}
+function removeUploadFile(i){ _uploadFiles.splice(i,1); renderPreview(); const btn=document.getElementById('uploadBtn'); if(btn) btn.disabled=_uploadFiles.length===0; }
+function renderPreview(){
+  const area = document.getElementById('previewArea');
+  if(!area) return;
+  area.innerHTML = _uploadFiles.map((f,i)=>{
+    if(f.type.startsWith('image/')){
+      const url=URL.createObjectURL(f);
+      return `<div class="position-relative"><img src="${url}" style="width:80px;height:60px;object-fit:cover;border-radius:6px;border:2px solid #d0daea"><button class="btn btn-danger p-0 position-absolute top-0 end-0" style="width:18px;height:18px;font-size:.6rem;line-height:1" onclick="removeUploadFile(${i})"><i class="bi bi-x"></i></button></div>`;
+    } else {
+      return `<div class="position-relative d-flex flex-column align-items-center justify-content-center bg-light" style="width:80px;height:60px;border-radius:6px;border:2px solid #d0daea"><i class="bi bi-file-pdf text-danger"></i><small style="font-size:.6rem;word-break:break-all;text-align:center;padding:0 2px">${esc(f.name.substring(0,12))}</small><button class="btn btn-danger p-0 position-absolute top-0 end-0" style="width:18px;height:18px;font-size:.6rem;line-height:1" onclick="removeUploadFile(${i})"><i class="bi bi-x"></i></button></div>`;
+    }
+  }).join('');
+}
+async function doUpload(bid, iid){
+  const btn = document.getElementById('uploadBtn');
+  if(btn){ btn.disabled=true; btn.innerHTML='<span class="spinner-border spinner-border-sm me-1"></span>アップロード中...'; }
+  const photoType = document.getElementById('upPhotoType')?.value||'';
+  const memberType = document.getElementById('upMemberType')?.value||'';
+  const damageType = document.getElementById('upDamageType')?.value||'';
+  const caption = document.getElementById('upCaption')?.value||'';
+  for(const f of _uploadFiles){
+    const buf = await f.arrayBuffer();
+    await PhotoStore.add({bridge_id:bid,inspection_id:iid,original_filename:f.name,photo_type:photoType,member_type:memberType,damage_type:damageType,caption,mime:f.type,data:buf});
+  }
+  closeModal();
+  navigate(`/bridge/${bid}`,{tab:'photos',selectedPhotoInspection:iid});
+}
+
+// ─── 写真プレビュー ───────────────────────────────
+function previewPhoto(url, isPdf, caption){
+  const overlay = document.createElement('div');
+  overlay.className = 'photo-preview-modal';
+  overlay.innerHTML = isPdf
+    ? `<div style="width:90vw;height:85vh;background:#fff;border-radius:8px;overflow:hidden"><div class="d-flex justify-content-between align-items-center p-2 border-bottom"><span>${esc(caption)}</span><button class="btn btn-sm btn-secondary" onclick="this.closest('.photo-preview-modal').remove()"><i class="bi bi-x-lg"></i></button></div><iframe src="${url}" style="width:100%;height:calc(100% - 44px);border:none"></iframe></div>`
+    : `<div style="text-align:center"><img src="${url}" alt="${esc(caption)}"><p class="text-white-50 mt-2">${esc(caption)}</p><button class="btn btn-secondary mt-2" onclick="this.closest('.photo-preview-modal').remove()"><i class="bi bi-x-lg me-1"></i>閉じる</button></div>`;
+  overlay.addEventListener('click',e=>{ if(e.target===overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
+}
+
+// ─── 削除確認 ────────────────────────────────────
+function confirmDeleteBridge(id, name){
+  showModal(`<div class="modal-header-custom"><h5 class="mb-0"><i class="bi bi-exclamation-triangle me-2"></i>削除の確認</h5><button class="btn-close" onclick="closeModal()"></button></div>
+  <div class="p-4"><p class="mb-1">「<strong>${esc(name)}</strong>」を削除します。</p><p class="text-danger mb-0"><i class="bi bi-exclamation-circle me-1"></i>点検記録・写真を含む全データが削除されます。この操作は取り消せません。</p></div>
+  <div class="p-3 border-top d-flex gap-2 justify-content-end">
+    <button class="btn btn-secondary" onclick="closeModal()">キャンセル</button>
+    <button class="btn btn-danger" onclick="DB.deleteBridge(${id});closeModal();navigate('/')"><i class="bi bi-trash me-1"></i>削除する</button>
+  </div>`);
+}
+function confirmDeleteInspection(iid){
+  const insp = DB.getInspection(iid);
+  showModal(`<div class="modal-header-custom"><h5 class="mb-0"><i class="bi bi-exclamation-triangle me-2"></i>削除の確認</h5><button class="btn-close" onclick="closeModal()"></button></div>
+  <div class="p-4"><p class="text-danger mb-0"><i class="bi bi-exclamation-circle me-1"></i>この点検記録と関連する損傷記録・写真がすべて削除されます。</p></div>
+  <div class="p-3 border-top d-flex gap-2 justify-content-end">
+    <button class="btn btn-secondary" onclick="closeModal()">キャンセル</button>
+    <button class="btn btn-danger" onclick="DB.deleteInspection(${iid});closeModal();navigate('/bridge/${insp?.bridge_id}',{tab:'inspection'})"><i class="bi bi-trash me-1"></i>削除する</button>
+  </div>`);
+}
+function deleteDamage(iid, did){
+  if(confirm('この損傷記録を削除しますか？')){ const insp=DB.getInspection(iid); DB.deleteDamage(did); navigate(`/bridge/${insp?.bridge_id}`,{tab:'inspection',selectedInspection:iid}); }
+}
+async function deletePhoto(pid, bid, iid){ if(confirm('この写真を削除しますか？')){ await PhotoStore.delete(pid); navigate(`/bridge/${bid}`,{tab:'photos',selectedPhotoInspection:iid}); } }
+
+// ─── モーダル共通 ────────────────────────────────
+function showModal(html, size=''){
+  closeModal();
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay'; overlay.id = 'modalOverlay';
+  overlay.innerHTML = `<div class="modal-box ${size}">${html}</div>`;
+  overlay.addEventListener('click',e=>{ if(e.target===overlay) closeModal(); });
+  document.body.appendChild(overlay);
+}
+function closeModal(){ document.getElementById('modalOverlay')?.remove(); }
+
+// ─── bindBridgeDetail ───────────────────────────
+async function bindBridgeDetail(id){
+  const tab = currentState.tab||'ledger';
+  if(tab==='photos'){
+    const inspections = DB.getInspections(id);
+    const selId = currentState.selectedPhotoInspection||(inspections[0]?.id);
+    if(selId) await loadPhotoGallery(id, selId);
+  }
+}
+
+// ─── 起動 ───────────────────────────────────────
+DB.load();
+PhotoStore.init().then(()=>{
+  window.addEventListener('hashchange', ()=>{
+    const hash = location.hash.replace('#','') || '/';
+    navigate(hash);
+  });
+  const hash = location.hash.replace('#','') || '/';
+  navigate(hash);
+}).catch(()=>{
+  navigate('/');
+});
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
