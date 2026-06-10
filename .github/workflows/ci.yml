@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  push:
+    branches: ["main", "claude/**"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  backend:
+    name: バックエンド検証
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Python 3.11 セットアップ
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+          cache-dependency-path: backend/requirements.txt
+
+      - name: 依存パッケージのインストール
+        run: pip install -r backend/requirements.txt
+
+      - name: インポートチェック
+        working-directory: backend
+        run: python -c "from main import app; print('OK')"
+
+      - name: DB初期化 & サンプルデータ投入
+        working-directory: backend
+        run: python seed_data.py
+
+      - name: ヘルスチェック
+        working-directory: backend
+        run: |
+          uvicorn main:app --host 0.0.0.0 --port 8000 &
+          sleep 4
+          curl -sf http://localhost:8000/health
+          curl -sf http://localhost:8000/api/bridges/ | python -m json.tool
+
+  frontend:
+    name: フロントエンド ビルド
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Node.js 20 セットアップ
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: 依存パッケージのインストール
+        working-directory: frontend
+        run: npm ci
+
+      - name: ビルド
+        working-directory: frontend
+        run: npm run build
+
+      - name: ビルド成果物の確認
+        run: ls -lh frontend/dist/assets/
