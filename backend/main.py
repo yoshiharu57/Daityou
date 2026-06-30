@@ -6,7 +6,7 @@ import os
 
 from database import engine
 import models
-from routers import projects, activity_logs
+from routers import projects, activity_logs, opportunities
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -26,6 +26,7 @@ app.add_middleware(
 
 app.include_router(projects.router)
 app.include_router(activity_logs.router)
+app.include_router(opportunities.router)
 
 
 @app.get("/health")

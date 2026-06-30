@@ -1,6 +1,47 @@
 from pydantic import BaseModel
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
 from datetime import date, datetime
+
+
+class OpportunityBase(BaseModel):
+    opportunity_name: str
+    client_organization: Optional[str] = None
+    client_contact: Optional[str] = None
+    bid_date: Optional[date] = None
+    estimated_amount: Optional[float] = 0
+    win_probability: Optional[int] = 50
+    stage: Optional[str] = "情報収集"
+    project_type: Optional[str] = None
+    person_in_charge: Optional[str] = None
+    competitor: Optional[str] = None
+    notes: Optional[str] = None
+
+
+class OpportunityCreate(OpportunityBase):
+    pass
+
+
+class OpportunityUpdate(BaseModel):
+    opportunity_name: Optional[str] = None
+    client_organization: Optional[str] = None
+    client_contact: Optional[str] = None
+    bid_date: Optional[date] = None
+    estimated_amount: Optional[float] = None
+    win_probability: Optional[int] = None
+    stage: Optional[str] = None
+    project_type: Optional[str] = None
+    person_in_charge: Optional[str] = None
+    competitor: Optional[str] = None
+    notes: Optional[str] = None
+
+
+class OpportunityResponse(OpportunityBase):
+    id: int
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
 
 
 class ProjectBase(BaseModel):

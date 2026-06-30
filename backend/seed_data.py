@@ -131,5 +131,77 @@ logs = [
 
 db.add_all(logs)
 db.commit()
+
+if db.query(models.Opportunity).count() == 0:
+    opportunities = [
+        models.Opportunity(
+            opportunity_name="〇〇市道路改良設計業務（R7年度）",
+            client_organization="〇〇市建設局",
+            client_contact="斎藤 博",
+            bid_date=date(2025, 2, 15),
+            estimated_amount=6000000,
+            win_probability=70,
+            stage="提案中",
+            project_type="道路設計",
+            person_in_charge="山田 太郎",
+            competitor="△△コンサルタント",
+            notes="昨年度も受注実績あり。有利な立場。",
+        ),
+        models.Opportunity(
+            opportunity_name="▲▲川護岸修繕設計",
+            client_organization="▲▲県河川砂防課",
+            client_contact="松本 裕子",
+            bid_date=date(2025, 3, 1),
+            estimated_amount=9500000,
+            win_probability=40,
+            stage="情報収集",
+            project_type="河川・治水",
+            person_in_charge="鈴木 健一",
+            competitor="〇〇建設コンサルタント・□□技術研究所",
+            notes="競合2社と競争入札。技術提案書で差別化を図る。",
+        ),
+        models.Opportunity(
+            opportunity_name="■■地区上水道整備計画",
+            client_organization="■■市上下水道局",
+            client_contact="田村 雅彦",
+            bid_date=date(2025, 1, 20),
+            estimated_amount=4200000,
+            win_probability=85,
+            stage="入札済み",
+            project_type="上下水道",
+            person_in_charge="佐藤 雄二",
+            competitor="なし（随意契約）",
+            notes="随意契約交渉中。金額調整段階。",
+        ),
+        models.Opportunity(
+            opportunity_name="◎◎港湾浚渫工事設計",
+            client_organization="◎◎港湾事務所",
+            client_contact="中島 光一",
+            bid_date=date(2025, 4, 10),
+            estimated_amount=15000000,
+            win_probability=30,
+            stage="情報収集",
+            project_type="港湾・海岸",
+            person_in_charge="伊藤 次郎",
+            competitor="大手コンサル3社",
+            notes="大型案件。JV参加を検討中。",
+        ),
+        models.Opportunity(
+            opportunity_name="★★トンネル詳細設計（第2工区）",
+            client_organization="★★道路公社",
+            client_contact="小林 健太",
+            bid_date=None,
+            estimated_amount=11000000,
+            win_probability=60,
+            stage="提案中",
+            project_type="トンネル",
+            person_in_charge="山田 太郎",
+            competitor="××エンジニアリング",
+            notes="現行R6-005の継続案件。関係良好。",
+        ),
+    ]
+    db.add_all(opportunities)
+    db.commit()
+
 db.close()
 print("サンプルデータを投入しました")

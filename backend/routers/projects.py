@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from sqlalchemy import func
+from sqlalchemy import func, extract
 from typing import List, Optional
 from datetime import date
+from collections import defaultdict
 import models, schemas
 from database import get_db
 
@@ -110,3 +111,69 @@ def delete_project(project_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="案件が見つかりません")
     db.delete(project)
     db.commit()
+
+
+@router.get("/analytics/engineer-workload")
+def engineer_workload(db: Session = Depends(get_db)):
+    """担当技術者ごとの稼働状況"""
+    active = db.query(models.Project).filter(models.Project.status == "進行中").all()
+    workload: dict = {}
+    for p in active:
+        for role, name in [("担当", p.person_in_charge), ("主任技術者", p.chief_engineer), ("照査技術者", p.review_engineer)]:
+            if not name:
+                continue
+            if name not in workload:
+                workload[name] = {"name": name, "count": 0, "total_progress": 0, "projects": []}
+            workload[name]["count"] += 1
+            workload[name]["total_progress"] += p.progress_rate or 0
+            workload[name]["projects"].append({
+                "id": p.id,
+                "business_number": p.business_number,
+                "project_name": p.project_name,
+                "role": role,
+                "progress_rate": p.progress_rate,
+                "end_date": str(p.end_date) if p.end_date else None,
+            })
+    return list(workload.values())
+
+
+@router.get("/analytics/monthly-revenue")
+def monthly_revenue(year: Optional[int] = None, db: Session = Depends(get_db)):
+    """月次受注金額集計"""
+    target_year = year or date.today().year
+    projects = db.query(models.Project).filter(
+        models.Project.contract_date.isnot(None),
+        extract("year", models.Project.contract_date) == target_year,
+        models.Project.status != "中断",
+    ).all()
+
+    monthly: dict = defaultdict(lambda: {"amount": 0, "count": 0, "types": defaultdict(float)})
+    for p in projects:
+        m = p.contract_date.month
+        monthly[m]["amount"] += p.contract_amount or 0
+        monthly[m]["count"] += 1
+        monthly[m]["types"][p.project_type or "その他"] += p.contract_amount or 0
+
+    result = []
+    for m in range(1, 13):
+        d = monthly[m]
+        result.append({
+            "month": m,
+            "label": f"{m}月",
+            "amount": d["amount"],
+            "count": d["count"],
+            "types": dict(d["types"]),
+        })
+    return {"year": target_year, "months": result}
+
+
+@router.get("/analytics/type-breakdown")
+def type_breakdown(db: Session = Depends(get_db)):
+    """業務種別構成"""
+    projects = db.query(models.Project).filter(models.Project.status != "中断").all()
+    breakdown: dict = defaultdict(lambda: {"count": 0, "amount": 0})
+    for p in projects:
+        t = p.project_type or "その他"
+        breakdown[t]["count"] += 1
+        breakdown[t]["amount"] += p.contract_amount or 0
+    return [{"type": k, **v} for k, v in sorted(breakdown.items(), key=lambda x: -x[1]["amount"])]
