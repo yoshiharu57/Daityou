@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { bridgeApi, HEALTH_LABELS, formatDate, googleMapsUrl } from '../api'
+import { bridgeApi, HEALTH_LABELS, formatDate, formatDateFull, googleMapsUrl } from '../api'
 
 export default function BridgeListPage() {
   const [bridges, setBridges] = useState([])
@@ -138,6 +138,7 @@ export default function BridgeListPage() {
                       <th>所在地</th>
                       <th style={{ width: '80px' }} className="text-center">地図</th>
                       <th style={{ width: '110px' }} className="text-center">前回点検</th>
+                      <th style={{ width: '110px' }} className="text-center">次回点検予定</th>
                       <th style={{ width: '90px' }} className="text-center">健全性</th>
                       <th style={{ width: '70px' }} className="text-center">点検数</th>
                     </tr>
@@ -183,6 +184,12 @@ export default function BridgeListPage() {
                             {b.last_inspection_date
                               ? <><i className="bi bi-calendar3 me-1 text-muted"></i>{formatDate(b.last_inspection_date)}</>
                               : <span className="text-muted">未点検</span>
+                            }
+                          </td>
+                          <td className="align-middle text-center" style={{ fontSize: '0.88rem' }}>
+                            {b.next_inspection_date
+                              ? <><i className="bi bi-calendar-check me-1 text-success"></i>{formatDate(b.next_inspection_date)}</>
+                              : <span className="text-muted">—</span>
                             }
                           </td>
                           <td className="align-middle text-center">

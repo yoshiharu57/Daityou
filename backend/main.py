@@ -10,6 +10,18 @@ from routers import projects, activity_logs, opportunities
 
 models.Base.metadata.create_all(bind=engine)
 
+# 初回起動時にサンプルデータを投入（橋梁が0件のときのみ）
+def _seed_if_empty():
+    from database import SessionLocal
+    db = SessionLocal()
+    try:
+        if db.query(models.Bridge).count() == 0:
+            import seed_data  # noqa: F401
+    finally:
+        db.close()
+
+_seed_if_empty()
+
 app = FastAPI(
     title="建設コンサルタント案件管理システム",
     description="営業職向け受注案件管理システム",
