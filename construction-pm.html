@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>建設コンサル 案件管理システム</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<style>
+:root{--primary:#1a3a5c;--primary2:#2563a8;--accent:#f59e0b}
+body{font-family:'Noto Sans JP','Meiryo',sans-serif;font-size:14px;background:#f0f4f8}
+.navbar-main{background:linear-gradient(135deg,#1a3a5c,#2563a8);box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.navbar-main .nav-link{color:rgba(255,255,255,.85)!important;font-size:.88rem;border-radius:6px;padding:.4rem .7rem}
+.navbar-main .nav-link:hover,.navbar-main .nav-link.active{color:#fff!important;background:rgba(255,255,255,.15)}
+.navbar-main .navbar-brand{color:#fff!important;font-weight:700}
+.page{display:none}.page.active{display:block}
+.stat-card{border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.08);border:0}
+.badge-status-active{background:#2563a8;color:#fff}
+.badge-status-overdue{background:#dc2626;color:#fff}
+.badge-status-near{background:#f59e0b;color:#000}
+.badge-status-done{background:#059669;color:#fff}
+.badge-status-paused{background:#6b7280;color:#fff}
+.progress{height:10px}
+.timeline-dot{width:36px;height:36px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;color:#fff;background:#2563a8}
+.timeline-line{width:2px;flex-grow:1;margin-top:4px;background:#dee2e6}
+.kanban-col{min-height:300px;border-radius:10px;padding:10px;background:#f8fafc;border:1px solid #e2e8f0}
+.kanban-card{background:#fff;border-radius:8px;padding:10px;margin-bottom:8px;box-shadow:0 1px 4px rgba(0,0,0,.08);border-left:4px solid #2563a8;cursor:pointer}
+.kanban-card:hover{box-shadow:0 3px 10px rgba(0,0,0,.12)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal-cell{min-height:70px;background:#fff;border-radius:6px;padding:4px;border:1px solid #e2e8f0;font-size:.78rem}
+.cal-cell.today{background:#eff6ff;border-color:#2563a8}
+.cal-cell.other-month{background:#f8f9fa;color:#aaa}
+.cal-day-header{text-align:center;font-weight:700;font-size:.8rem;padding:6px 0;color:#6b7280}
+.cal-day-header:nth-child(1){color:#dc2626}
+.cal-day-header:nth-child(7){color:#2563a8}
+.cal-event{font-size:.7rem;border-radius:3px;padding:1px 4px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cal-event-end{background:#fee2e2;color:#991b1b}
+.cal-event-start{background:#d1fae5;color:#065f46}
+.cal-event-contract{background:#ede9fe;color:#5b21b6}
+.workload-bar{height:28px;border-radius:4px;background:#2563a8;display:flex;align-items:center;padding:0 8px;color:#fff;font-size:.78rem;font-weight:700;transition:width .4s}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1050;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal-box{background:#fff;border-radius:12px;width:90%;max-width:720px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.modal-box.wide{max-width:900px}
+.modal-head{background:linear-gradient(135deg,#1a3a5c,#2563a8);color:#fff;padding:1rem 1.25rem;border-radius:12px 12px 0 0;display:flex;justify-content:space-between;align-items:center}
+.modal-head .close-btn{background:0;border:0;color:#fff;font-size:1.4rem;cursor:pointer;line-height:1}
+table.table thead th{background:#1a3a5c;color:#fff;white-space:nowrap;border:0}
+.section-title{font-size:.95rem;font-weight:700;color:#1a3a5c;border-left:4px solid #2563a8;padding-left:.6rem;margin-bottom:.8rem}
+.form-label{font-weight:600;font-size:.88rem}
+footer{background:#1a3a5c;color:#aac4e0;font-size:.8rem;text-align:center;padding:.5rem}
+.cursor-pointer{cursor:pointer}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-main py-2">
+  <div class="container-fluid px-3">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="#" onclick="showPage('dashboard')">
+      <i class="bi bi-briefcase-fill"></i>
+      <span style="font-size:.95rem">建設コンサル 案件管理</span>
+    </a>
+    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav gap-1 me-auto">
+        <li class="nav-item"><a class="nav-link" id="nav-dashboard" href="#" onclick="showPage('dashboard')"><i class="bi bi-speedometer2 me-1"></i>ダッシュボード</a></li>
+        <li class="nav-item"><a class="nav-link" id="nav-projects" href="#" onclick="showPage('projects')"><i class="bi bi-table me-1"></i>案件一覧</a></li>
+        <li class="nav-item"><a class="nav-link" id="nav-pipeline" href="#" onclick="showPage('pipeline')"><i class="bi bi-funnel me-1"></i>パイプライン</a></li>
+        <li class="nav-item"><a class="nav-link" id="nav-engineers" href="#" onclick="showPage('engineers')"><i class="bi bi-people me-1"></i>技術者稼働</a></li>
+        <li class="nav-item"><a class="nav-link" id="nav-calendar" href="#" onclick="showPage('calendar')"><i class="bi bi-calendar3 me-1"></i>カレンダー</a></li>
+        <li class="nav-item"><a class="nav-link" id="nav-reports" href="#" onclick="showPage('reports')"><i class="bi bi-bar-chart me-1"></i>売上分析</a></li>
+      </ul>
+      <button class="btn btn-warning btn-sm text-dark fw-bold px-3" onclick="openProjectForm()">
+        <i class="bi bi-plus-circle me-1"></i>案件登録
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<main class="py-3 px-3 px-md-4">
+
+<!-- ====== DASHBOARD ====== -->
+<div class="page active" id="page-dashboard">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="fw-bold mb-0"><i class="bi bi-speedometer2 me-2 text-primary"></i>ダッシュボード</h5>
+    <span class="text-muted small" id="dash-today"></span>
+  </div>
+  <div class="row g-3 mb-3" id="dash-stats"></div>
+  <div id="dash-alerts"></div>
+  <div class="card border-0 shadow-sm">
+    <div class="card-header bg-white border-bottom d-flex align-items-center justify-content-between flex-wrap gap-2 py-2">
+      <div class="btn-group btn-group-sm" id="dash-filter-btns"></div>
+      <button class="btn btn-sm btn-success" onclick="openProjectForm()"><i class="bi bi-plus-circle me-1"></i>案件登録</button>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0 small">
+          <thead><tr>
+            <th style="width:90px">業務No.</th><th>案件名</th>
+            <th style="width:120px">発注機関</th><th style="width:85px">担当者</th>
+            <th style="width:90px">工期終了</th><th style="width:70px">残日数</th>
+            <th style="width:80px">担当技術者</th><th style="width:150px">進捗</th>
+            <th style="width:80px">状況</th><th style="width:60px"></th>
+          </tr></thead>
+          <tbody id="dash-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== PROJECT LIST ====== -->
+<div class="page" id="page-projects">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="fw-bold mb-0"><i class="bi bi-table me-2 text-primary"></i>案件一覧</h5>
+    <div class="d-flex gap-2">
+      <button class="btn btn-outline-secondary btn-sm" onclick="exportCsv()"><i class="bi bi-download me-1"></i>CSV出力</button>
+      <button class="btn btn-success btn-sm" onclick="openProjectForm()"><i class="bi bi-plus-circle me-1"></i>案件登録</button>
+    </div>
+  </div>
+  <div class="card border-0 shadow-sm mb-3">
+    <div class="card-body py-2">
+      <div class="row g-2">
+        <div class="col-12 col-md-4">
+          <div class="input-group input-group-sm">
+            <span class="input-group-text"><i class="bi bi-search"></i></span>
+            <input class="form-control" id="proj-search" placeholder="案件名・No.・発注機関で検索" oninput="renderProjectList()">
+          </div>
+        </div>
+        <div class="col-6 col-md-2">
+          <select class="form-select form-select-sm" id="proj-status-filter" onchange="renderProjectList()">
+            <option value="">全ステータス</option>
+            <option>進行中</option><option>完了</option><option>中断</option>
+          </select>
+        </div>
+        <div class="col-6 col-md-2">
+          <select class="form-select form-select-sm" id="proj-type-filter" onchange="renderProjectList()">
+            <option value="">全業務種別</option>
+          </select>
+        </div>
+        <div class="col-6 col-md-2">
+          <select class="form-select form-select-sm" id="proj-eng-filter" onchange="renderProjectList()">
+            <option value="">全担当技術者</option>
+          </select>
+        </div>
+        <div class="col-6 col-md-2 text-end text-muted small d-flex align-items-center justify-content-end" id="proj-count"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0 small">
+          <thead><tr>
+            <th style="width:90px" class="cursor-pointer" onclick="sortProjects('business_number')">業務No. <span id="sort-business_number"></span></th>
+            <th class="cursor-pointer" onclick="sortProjects('project_name')">案件名 <span id="sort-project_name"></span></th>
+            <th style="width:120px">発注機関</th>
+            <th style="width:85px">相手先担当</th>
+            <th style="width:90px" class="cursor-pointer" onclick="sortProjects('contract_date')">契約日 <span id="sort-contract_date"></span></th>
+            <th style="width:90px" class="cursor-pointer" onclick="sortProjects('start_date')">工期開始 <span id="sort-start_date"></span></th>
+            <th style="width:90px" class="cursor-pointer" onclick="sortProjects('end_date')">工期終了 <span id="sort-end_date"></span></th>
+            <th style="width:65px">残日数</th>
+            <th style="width:75px">担当</th>
+            <th style="width:75px">主任</th>
+            <th style="width:75px">照査</th>
+            <th style="width:150px">進捗</th>
+            <th style="width:85px">受注金額</th>
+            <th style="width:75px">状況</th>
+            <th style="width:80px"></th>
+          </tr></thead>
+          <tbody id="proj-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== PIPELINE ====== -->
+<div class="page" id="page-pipeline">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="fw-bold mb-0"><i class="bi bi-funnel me-2 text-primary"></i>パイプライン管理</h5>
+    <button class="btn btn-success btn-sm" onclick="openOpportunityForm()"><i class="bi bi-plus-circle me-1"></i>商談追加</button>
+  </div>
+  <div class="row g-3 mb-3" id="pipeline-stats"></div>
+  <div class="row g-3" id="pipeline-kanban"></div>
+</div>
+
+<!-- ====== ENGINEERS ====== -->
+<div class="page" id="page-engineers">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="fw-bold mb-0"><i class="bi bi-people me-2 text-primary"></i>技術者稼働状況</h5>
+    <span class="text-muted small">進行中案件の稼働数</span>
+  </div>
+  <div id="engineers-content"></div>
+</div>
+
+<!-- ====== CALENDAR ====== -->
+<div class="page" id="page-calendar">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="fw-bold mb-0"><i class="bi bi-calendar3 me-2 text-primary"></i>案件カレンダー</h5>
+    <div class="d-flex align-items-center gap-2">
+      <button class="btn btn-sm btn-outline-secondary" onclick="calPrev()"><i class="bi bi-chevron-left"></i></button>
+      <span class="fw-bold" id="cal-month-label" style="min-width:7rem;text-align:center"></span>
+      <button class="btn btn-sm btn-outline-secondary" onclick="calNext()"><i class="bi bi-chevron-right"></i></button>
+    </div>
+  </div>
+  <div class="row g-3">
+    <div class="col-lg-9">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body pb-2">
+          <div class="cal-grid mb-1">
+            <div class="cal-day-header">日</div><div class="cal-day-header">月</div>
+            <div class="cal-day-header">火</div><div class="cal-day-header">水</div>
+            <div class="cal-day-header">木</div><div class="cal-day-header">金</div>
+            <div class="cal-day-header">土</div>
+          </div>
+          <div class="cal-grid" id="cal-grid"></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-3">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white fw-bold border-bottom small"><i class="bi bi-clock me-1 text-danger"></i>直近60日の期限</div>
+        <div class="card-body p-2" id="cal-upcoming" style="max-height:500px;overflow-y:auto"></div>
+      </div>
+      <div class="card border-0 shadow-sm mt-3">
+        <div class="card-body py-2 px-3">
+          <div class="small fw-bold mb-2">凡例</div>
+          <div class="d-flex flex-column gap-1">
+            <span><span class="cal-event cal-event-end d-inline-block me-1">■</span>工期終了</span>
+            <span><span class="cal-event cal-event-start d-inline-block me-1">■</span>工期開始</span>
+            <span><span class="cal-event cal-event-contract d-inline-block me-1">■</span>契約日</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== REPORTS ====== -->
+<div class="page" id="page-reports">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="fw-bold mb-0"><i class="bi bi-bar-chart me-2 text-primary"></i>売上分析</h5>
+    <select class="form-select form-select-sm" style="width:auto" id="report-year" onchange="renderReports()"></select>
+  </div>
+  <div class="row g-3 mb-3" id="report-kpis"></div>
+  <div class="row g-3">
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body"><canvas id="chart-monthly" height="200"></canvas></div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body"><canvas id="chart-type" height="200"></canvas></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<footer class="mt-3">建設コンサルタント案件管理システム &copy; <span id="copy-year"></span></footer>
+
+<!-- ====== MODALS ====== -->
+
+<!-- Project Form Modal -->
+<div class="modal-overlay" id="modal-project">
+  <div class="modal-box wide">
+    <div class="modal-head">
+      <span class="fw-bold" id="modal-project-title"><i class="bi bi-plus-circle me-2"></i>案件登録</span>
+      <button class="close-btn" onclick="closeModal('modal-project')">&times;</button>
+    </div>
+    <div class="p-4">
+      <form id="project-form" onsubmit="saveProject(event)">
+        <div class="section-title">基本情報</div>
+        <div class="row g-3 mb-3">
+          <div class="col-md-4">
+            <label class="form-label">業務ナンバー <span class="text-danger">*</span></label>
+            <input class="form-control form-control-sm" id="f-business_number" required placeholder="例: R6-001">
+          </div>
+          <div class="col-md-8">
+            <label class="form-label">案件名 <span class="text-danger">*</span></label>
+            <input class="form-control form-control-sm" id="f-project_name" required placeholder="業務名称を入力">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">業務種別</label>
+            <select class="form-select form-select-sm" id="f-project_type">
+              <option value="">選択してください</option>
+              <option>橋梁設計</option><option>道路設計</option><option>河川・治水</option>
+              <option>港湾・海岸</option><option>トンネル</option><option>地質調査</option>
+              <option>環境調査</option><option>都市計画</option><option>上下水道</option><option>その他</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">ステータス</label>
+            <select class="form-select form-select-sm" id="f-status">
+              <option>進行中</option><option>完了</option><option>中断</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">受注金額（円）</label>
+            <div class="input-group input-group-sm">
+              <span class="input-group-text">¥</span>
+              <input type="number" class="form-control" id="f-contract_amount" placeholder="0" min="0">
+            </div>
+          </div>
+        </div>
+        <div class="section-title">発注機関・担当者</div>
+        <div class="row g-3 mb-3">
+          <div class="col-md-6">
+            <label class="form-label">発注機関名</label>
+            <input class="form-control form-control-sm" id="f-client_organization" placeholder="例: ○○県土木部">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">相手先担当者名</label>
+            <input class="form-control form-control-sm" id="f-client_contact" placeholder="例: 田中 一郎">
+          </div>
+        </div>
+        <div class="section-title">工期・契約</div>
+        <div class="row g-3 mb-3">
+          <div class="col-md-4">
+            <label class="form-label">契約日</label>
+            <input type="date" class="form-control form-control-sm" id="f-contract_date">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">工期開始日</label>
+            <input type="date" class="form-control form-control-sm" id="f-start_date">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">工期終了日</label>
+            <input type="date" class="form-control form-control-sm" id="f-end_date">
+          </div>
+        </div>
+        <div class="section-title">担当技術者</div>
+        <div class="row g-3 mb-3">
+          <div class="col-md-4">
+            <label class="form-label">担当</label>
+            <input class="form-control form-control-sm" id="f-person_in_charge" list="eng-list" placeholder="技術者名">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">主任技術者</label>
+            <input class="form-control form-control-sm" id="f-chief_engineer" list="eng-list" placeholder="技術者名">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">照査技術者</label>
+            <input class="form-control form-control-sm" id="f-review_engineer" list="eng-list" placeholder="技術者名">
+          </div>
+          <datalist id="eng-list">
+            <option value="山田 太郎"><option value="鈴木 健一"><option value="佐藤 雄二">
+            <option value="伊藤 次郎"><option value="渡辺 三郎">
+          </datalist>
+        </div>
+        <div class="section-title">進捗・メモ</div>
+        <div class="row g-3 mb-3">
+          <div class="col-md-6">
+            <label class="form-label">業務進捗率: <strong id="f-progress-label">0%</strong></label>
+            <input type="range" class="form-range" id="f-progress_rate" min="0" max="100" step="5" value="0"
+              oninput="document.getElementById('f-progress-label').textContent=this.value+'%'">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">メモ・備考</label>
+            <textarea class="form-control form-control-sm" id="f-notes" rows="3" placeholder="特記事項など"></textarea>
+          </div>
+        </div>
+        <input type="hidden" id="f-id">
+        <div class="d-flex gap-2 justify-content-end">
+          <button type="button" class="btn btn-outline-secondary btn-sm" onclick="closeModal('modal-project')">キャンセル</button>
+          <button type="submit" class="btn btn-primary btn-sm px-4"><i class="bi bi-save me-1"></i>保存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Project Detail Modal -->
+<div class="modal-overlay" id="modal-detail">
+  <div class="modal-box wide">
+    <div class="modal-head">
+      <span class="fw-bold" id="detail-title">案件詳細</span>
+      <button class="close-btn" onclick="closeModal('modal-detail')">&times;</button>
+    </div>
+    <div class="p-4" id="detail-content"></div>
+  </div>
+</div>
+
+<!-- Opportunity Form Modal -->
+<div class="modal-overlay" id="modal-opportunity">
+  <div class="modal-box">
+    <div class="modal-head">
+      <span class="fw-bold" id="modal-opp-title"><i class="bi bi-plus-circle me-2"></i>商談追加</span>
+      <button class="close-btn" onclick="closeModal('modal-opportunity')">&times;</button>
+    </div>
+    <div class="p-4">
+      <form id="opportunity-form" onsubmit="saveOpportunity(event)">
+        <div class="row g-3">
+          <div class="col-12">
+            <label class="form-label">案件名 <span class="text-danger">*</span></label>
+            <input class="form-control form-control-sm" id="o-name" required placeholder="商談名称">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">発注機関</label>
+            <input class="form-control form-control-sm" id="o-client" placeholder="例: ○○市役所">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">ステージ</label>
+            <select class="form-select form-select-sm" id="o-stage">
+              <option>リード</option><option>提案準備</option><option>提案済</option>
+              <option>交渉中</option><option>受注</option><option>失注</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">想定金額（円）</label>
+            <div class="input-group input-group-sm">
+              <span class="input-group-text">¥</span>
+              <input type="number" class="form-control" id="o-amount" placeholder="0" min="0">
+            </div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">受注確度</label>
+            <div class="d-flex align-items-center gap-2">
+              <input type="range" class="form-range" id="o-prob" min="0" max="100" step="10" value="50"
+                oninput="document.getElementById('o-prob-label').textContent=this.value+'%'">
+              <span id="o-prob-label" style="min-width:3rem">50%</span>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">見込み日</label>
+            <input type="date" class="form-control form-control-sm" id="o-expected_date">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">担当者</label>
+            <input class="form-control form-control-sm" id="o-person" list="eng-list" placeholder="担当者名">
+          </div>
+          <div class="col-12">
+            <label class="form-label">メモ</label>
+            <textarea class="form-control form-control-sm" id="o-notes" rows="2"></textarea>
+          </div>
+        </div>
+        <input type="hidden" id="o-id">
+        <div class="d-flex gap-2 justify-content-end mt-3">
+          <button type="button" class="btn btn-outline-secondary btn-sm" onclick="closeModal('modal-opportunity')">キャンセル</button>
+          <button type="submit" class="btn btn-primary btn-sm px-4"><i class="bi bi-save me-1"></i>保存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Log Form Modal -->
+<div class="modal-overlay" id="modal-log">
+  <div class="modal-box">
+    <div class="modal-head">
+      <span class="fw-bold"><i class="bi bi-journal-plus me-2"></i>活動記録を追加</span>
+      <button class="close-btn" onclick="closeModal('modal-log')">&times;</button>
+    </div>
+    <div class="p-4">
+      <form id="log-form" onsubmit="saveLog(event)">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">日付 <span class="text-danger">*</span></label>
+            <input type="date" class="form-control form-control-sm" id="l-date" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">種別</label>
+            <select class="form-select form-select-sm" id="l-type">
+              <option>打合せ</option><option>提出</option><option>現地調査</option>
+              <option>電話</option><option>メール</option><option>その他</option>
+            </select>
+          </div>
+          <div class="col-md-8">
+            <label class="form-label">内容 <span class="text-danger">*</span></label>
+            <textarea class="form-control form-control-sm" id="l-description" rows="3" required></textarea>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">担当者</label>
+            <input class="form-control form-control-sm" id="l-staff" list="eng-list" placeholder="担当者名">
+          </div>
+          <div class="col-12">
+            <label class="form-label">次のアクション</label>
+            <input class="form-control form-control-sm" id="l-next" placeholder="次に行うこと">
+          </div>
+        </div>
+        <input type="hidden" id="l-project-id">
+        <div class="d-flex gap-2 justify-content-end mt-3">
+          <button type="button" class="btn btn-outline-secondary btn-sm" onclick="closeModal('modal-log')">キャンセル</button>
+          <button type="submit" class="btn btn-primary btn-sm px-4"><i class="bi bi-save me-1"></i>保存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// ============================================================
+// DATA LAYER
+// ============================================================
+const KEY_PROJECTS = 'cpm_projects';
+const KEY_OPPORTUNITIES = 'cpm_opportunities';
+const KEY_LOGS = 'cpm_logs';
+
+function load(key) { try { return JSON.parse(localStorage.getItem(key)) || [] } catch { return [] } }
+function save(key, data) { localStorage.setItem(key, JSON.stringify(data)) }
+
+let projects = load(KEY_PROJECTS);
+let opportunities = load(KEY_OPPORTUNITIES);
+let logs = load(KEY_LOGS);
+
+// SAMPLE DATA (only on first run)
+if (!projects.length) {
+  const today = new Date();
+  const addDays = (d, n) => { const r = new Date(d); r.setDate(r.getDate()+n); return r.toISOString().slice(0,10); };
+  projects = [
+    { id:1, business_number:'R6-001', project_name:'○○橋梁詳細設計業務', client_organization:'○○県土木部', client_contact:'田中 一郎', contract_date:'2024-04-01', start_date:'2024-04-10', end_date: addDays(today, 45), project_type:'橋梁設計', person_in_charge:'山田 太郎', chief_engineer:'鈴木 健一', review_engineer:'佐藤 雄二', contract_amount:8500000, progress_rate:65, status:'進行中', notes:'○○川河口部の橋梁更新事業。現地調査完了。設計中。' },
+    { id:2, business_number:'R6-002', project_name:'△△バイパス道路詳細設計', client_organization:'国土交通省△△事務所', client_contact:'鈴木 二郎', contract_date:'2024-03-15', start_date:'2024-03-25', end_date: addDays(today, -10), project_type:'道路設計', person_in_charge:'鈴木 健一', chief_engineer:'山田 太郎', review_engineer:'渡辺 三郎', contract_amount:15000000, progress_rate:90, status:'進行中', notes:'4車線化のための詳細設計。報告書作成中。' },
+    { id:3, business_number:'R6-003', project_name:'□□川護岸整備設計', client_organization:'□□市建設課', client_contact:'佐藤 三郎', contract_date:'2024-05-01', start_date:'2024-05-10', end_date: addDays(today, 180), project_type:'河川・治水', person_in_charge:'佐藤 雄二', chief_engineer:'佐藤 雄二', review_engineer:'伊藤 次郎', contract_amount:5200000, progress_rate:30, status:'進行中', notes:'護岸崩壊箇所の応急・恒久対策設計。' },
+    { id:4, business_number:'R5-088', project_name:'◇◇港湾改良工事設計', client_organization:'◇◇県港湾局', client_contact:'伊藤 四郎', contract_date:'2023-10-01', start_date:'2023-10-15', end_date: addDays(today, -60), project_type:'港湾・海岸', person_in_charge:'伊藤 次郎', chief_engineer:'鈴木 健一', review_engineer:'山田 太郎', contract_amount:22000000, progress_rate:100, status:'完了', notes:'防波堤延伸設計。納品済み。' },
+    { id:5, business_number:'R6-004', project_name:'★★地区地質調査業務', client_organization:'★★市都市計画部', client_contact:'渡辺 五郎', contract_date:'2024-06-01', start_date:'2024-06-15', end_date: addDays(today, 22), project_type:'地質調査', person_in_charge:'渡辺 三郎', chief_engineer:'渡辺 三郎', review_engineer:'山田 太郎', contract_amount:3800000, progress_rate:50, status:'進行中', notes:'新市街地開発のためのボーリング調査。' },
+  ];
+  logs = [
+    { id:1, project_id:1, log_date:'2024-09-10', activity_type:'打合せ', description:'中間検討会を実施。設計方針を確認。', staff_name:'山田 太郎', next_action:'計算書第3稿を作成して提出する' },
+    { id:2, project_id:1, log_date:'2024-10-01', activity_type:'提出', description:'設計計算書（中間）を提出。', staff_name:'山田 太郎', next_action:'' },
+    { id:3, project_id:2, log_date:'2024-09-20', activity_type:'電話', description:'工程遅延について発注者へ連絡。了承を得た。', staff_name:'鈴木 健一', next_action:'11月末までに報告書案を提出' },
+  ];
+  opportunities = [
+    { id:1, name:'◆◆川橋梁補修設計', client:'◆◆市役所', stage:'提案済', amount:6000000, probability:70, expected_date:'2025-01-31', person:'山田 太郎', notes:'技術提案書を先週提出済み。' },
+    { id:2, name:'▲▲道路改良詳細設計', client:'県道路部', stage:'交渉中', amount:12000000, probability:80, expected_date:'2024-12-15', person:'鈴木 健一', notes:'金額交渉中。' },
+    { id:3, name:'■■地区環境調査', client:'市環境部', stage:'リード', amount:2500000, probability:30, expected_date:'2025-03-31', person:'佐藤 雄二', notes:'情報収集段階。' },
+    { id:4, name:'●●港防波堤設計', client:'港湾局', stage:'提案準備', amount:18000000, probability:50, expected_date:'2025-02-28', person:'伊藤 次郎', notes:'参考見積依頼あり。' },
+    { id:5, name:'★★区上水道整備', client:'水道局', stage:'受注', amount:9500000, probability:100, expected_date:'2024-11-01', person:'渡辺 三郎', notes:'受注確定。契約準備中。' },
+  ];
+  save(KEY_PROJECTS, projects);
+  save(KEY_LOGS, logs);
+  save(KEY_OPPORTUNITIES, opportunities);
+}
+
+// ============================================================
+// UTILITIES
+// ============================================================
+function nextId(arr) { return arr.length ? Math.max(...arr.map(x=>x.id)) + 1 : 1; }
+function fmtDate(d, fmt='yyyy/MM/dd') {
+  if (!d) return '-';
+  const dt = typeof d === 'string' ? new Date(d+'T00:00:00') : d;
+  const y=dt.getFullYear(), m=dt.getMonth()+1, day=dt.getDate();
+  return fmt.replace('yyyy',y).replace('MM',String(m).padStart(2,'0')).replace('dd',String(day).padStart(2,'0'));
+}
+function daysRemaining(endDate) {
+  if (!endDate) return null;
+  const end = new Date(endDate+'T00:00:00');
+  const now = new Date(); now.setHours(0,0,0,0);
+  return Math.round((end - now) / 86400000);
+}
+function statusBadge(p) {
+  if (p.status==='完了') return '<span class="badge bg-success">完了</span>';
+  if (p.status==='中断') return '<span class="badge bg-secondary">中断</span>';
+  const d = daysRemaining(p.end_date);
+  if (d === null) return '<span class="badge bg-primary">進行中</span>';
+  if (d < 0) return '<span class="badge bg-danger">期限超過</span>';
+  if (d <= 30) return `<span class="badge bg-warning text-dark">残${d}日</span>`;
+  return '<span class="badge bg-primary">進行中</span>';
+}
+function rowClass(p) {
+  if (p.status==='完了') return 'table-light';
+  if (p.status==='中断') return 'table-secondary';
+  const d = daysRemaining(p.end_date);
+  if (d !== null && d < 0) return 'table-danger';
+  if (d !== null && d <= 30) return 'table-warning';
+  return '';
+}
+function progressBar(val, h=10) {
+  const v = val || 0;
+  const c = v>=100?'bg-success':v>=60?'bg-primary':v>=30?'bg-warning':'bg-danger';
+  return `<div class="d-flex align-items-center gap-1">
+    <div class="progress flex-grow-1" style="height:${h}px">
+      <div class="progress-bar ${c}" style="width:${Math.min(v,100)}%"></div>
+    </div>
+    <span class="small fw-bold" style="min-width:34px">${v}%</span>
+  </div>`;
+}
+function amountStr(a) {
+  if (!a) return '-';
+  if (a >= 1e8) return (a/1e8).toFixed(1)+'億円';
+  if (a >= 1e4) return Math.round(a/1e4)+'万円';
+  return a.toLocaleString()+'円';
+}
+function todayStr() { return new Date().toISOString().slice(0,10); }
+
+// ============================================================
+// NAV & PAGES
+// ============================================================
+let currentPage = 'dashboard';
+let calYear, calMonth;
+const now = new Date();
+calYear = now.getFullYear(); calMonth = now.getMonth();
+
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  const navEl = document.getElementById('nav-'+name);
+  if (navEl) navEl.classList.add('active');
+  currentPage = name;
+  if (name==='dashboard') renderDashboard();
+  if (name==='projects') renderProjectList();
+  if (name==='pipeline') renderPipeline();
+  if (name==='engineers') renderEngineers();
+  if (name==='calendar') renderCalendar();
+  if (name==='reports') renderReports();
+  return false;
+}
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+let dashFilter = 'active';
+
+function renderDashboard() {
+  document.getElementById('dash-today').textContent = fmtDate(todayStr(),'yyyy年MM月dd日') + ' 現在';
+  const active = projects.filter(p=>p.status==='進行中');
+  const overdue = active.filter(p=>{ const d=daysRemaining(p.end_date); return d!==null&&d<0; });
+  const near = active.filter(p=>{ const d=daysRemaining(p.end_date); return d!==null&&d>=0&&d<=30; });
+  const done = projects.filter(p=>p.status==='完了');
+  const totalAmt = [...active,...done].reduce((s,p)=>s+(p.contract_amount||0),0);
+
+  const stats = [
+    { label:'総案件数', value:projects.length, icon:'bi-folder2-open', color:'#2563a8' },
+    { label:'進行中', value:active.length, icon:'bi-play-circle-fill', color:'#059669' },
+    { label:'期限超過', value:overdue.length, icon:'bi-exclamation-triangle-fill', color:'#dc2626' },
+    { label:'受注金額合計', value:amountStr(totalAmt), icon:'bi-currency-yen', color:'#7c3aed', sub:'進行中＋完了' },
+  ];
+  document.getElementById('dash-stats').innerHTML = stats.map(s=>`
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body d-flex align-items-center gap-3 py-3">
+          <div class="rounded-circle d-flex align-items-center justify-content-center text-white flex-shrink-0"
+            style="width:50px;height:50px;background:${s.color}">
+            <i class="bi ${s.icon} fs-5"></i>
+          </div>
+          <div>
+            <div class="fs-3 fw-bold lh-1">${s.value}</div>
+            <div class="text-muted small">${s.label}</div>
+            ${s.sub?`<div class="text-muted" style="font-size:.72rem">${s.sub}</div>`:''}
+          </div>
+        </div>
+      </div>
+    </div>`).join('');
+
+  let alerts = '';
+  if (overdue.length) alerts += `<div class="alert alert-danger d-flex align-items-center gap-2 mb-3 py-2">
+    <i class="bi bi-exclamation-triangle-fill"></i>
+    <strong>期限超過案件が${overdue.length}件あります。</strong>
+    <button class="btn btn-sm btn-outline-danger ms-auto" onclick="dashFilter='overdue';renderDashboard()">確認する</button>
+  </div>`;
+  if (near.length) alerts += `<div class="alert alert-warning d-flex align-items-center gap-2 mb-3 py-2">
+    <i class="bi bi-clock-fill"></i>
+    <strong>30日以内に工期終了を迎える案件が${near.length}件あります。</strong>
+    <button class="btn btn-sm btn-outline-warning ms-auto" onclick="dashFilter='near';renderDashboard()">確認する</button>
+  </div>`;
+  document.getElementById('dash-alerts').innerHTML = alerts;
+
+  const tabs = [
+    { key:'active', label:'進行中', count:active.length },
+    { key:'near', label:'期限間近(30日)', count:near.length },
+    { key:'overdue', label:'期限超過', count:overdue.length },
+    { key:'completed', label:'完了', count:done.length },
+    { key:'all', label:'すべて', count:projects.length },
+  ];
+  document.getElementById('dash-filter-btns').innerHTML = tabs.map(t=>`
+    <button class="btn btn-sm ${dashFilter===t.key?'btn-primary':'btn-outline-secondary'}"
+      onclick="dashFilter='${t.key}';renderDashboard()">
+      ${t.label} <span class="badge bg-light text-dark ms-1">${t.count}</span>
+    </button>`).join('');
+
+  const filtered = projects.filter(p => {
+    if (dashFilter==='active') return p.status==='進行中';
+    if (dashFilter==='overdue') { const d=daysRemaining(p.end_date); return p.status==='進行中'&&d!==null&&d<0; }
+    if (dashFilter==='near') { const d=daysRemaining(p.end_date); return p.status==='進行中'&&d!==null&&d>=0&&d<=30; }
+    if (dashFilter==='completed') return p.status==='完了';
+    return true;
+  });
+
+  document.getElementById('dash-table-body').innerHTML = filtered.length===0
+    ? `<tr><td colspan="10" class="text-center text-muted py-4">該当する案件がありません</td></tr>`
+    : filtered.map(p => {
+        const days = daysRemaining(p.end_date);
+        const daysTd = days===null ? '-' : days<0 ? `<span class="text-danger fw-bold">${Math.abs(days)}日超過</span>` : days<=30 ? `<span class="text-warning fw-bold">${days}日</span>` : `${days}日`;
+        return `<tr class="${rowClass(p)}">
+          <td class="fw-bold text-primary">${p.business_number}</td>
+          <td><a href="#" onclick="openDetail(${p.id})" class="text-decoration-none text-dark fw-semibold">${p.project_name}</a></td>
+          <td class="text-truncate" style="max-width:120px">${p.client_organization||'-'}</td>
+          <td>${p.client_contact||'-'}</td>
+          <td>${fmtDate(p.end_date)}</td>
+          <td>${daysTd}</td>
+          <td>${p.person_in_charge||'-'}</td>
+          <td>${progressBar(p.progress_rate)}</td>
+          <td>${statusBadge(p)}</td>
+          <td><button class="btn btn-outline-primary btn-sm py-0 px-2" onclick="openDetail(${p.id})">詳細</button></td>
+        </tr>`;
+      }).join('');
+}
+
+// ============================================================
+// PROJECT LIST
+// ============================================================
+let projSortKey = 'end_date', projSortAsc = true;
+
+function sortProjects(key) {
+  if (projSortKey===key) projSortAsc=!projSortAsc; else { projSortKey=key; projSortAsc=true; }
+  renderProjectList();
+}
+
+function renderProjectList() {
+  const search = (document.getElementById('proj-search').value||'').toLowerCase();
+  const stF = document.getElementById('proj-status-filter').value;
+  const tyF = document.getElementById('proj-type-filter').value;
+  const enF = document.getElementById('proj-eng-filter').value;
+
+  // Populate filter dropdowns
+  const types = [...new Set(projects.map(p=>p.project_type).filter(Boolean))];
+  const engs = [...new Set([...projects.map(p=>p.person_in_charge),...projects.map(p=>p.chief_engineer),...projects.map(p=>p.review_engineer)].filter(Boolean))];
+  const tyEl = document.getElementById('proj-type-filter');
+  const curTy = tyEl.value;
+  tyEl.innerHTML = '<option value="">全業務種別</option>' + types.map(t=>`<option ${t===curTy?'selected':''}>${t}</option>`).join('');
+  const enEl = document.getElementById('proj-eng-filter');
+  const curEn = enEl.value;
+  enEl.innerHTML = '<option value="">全担当技術者</option>' + engs.map(e=>`<option ${e===curEn?'selected':''}>${e}</option>`).join('');
+
+  let list = projects.filter(p => {
+    if (stF && p.status!==stF) return false;
+    if (tyF && p.project_type!==tyF) return false;
+    if (enF && ![p.person_in_charge,p.chief_engineer,p.review_engineer].includes(enF)) return false;
+    if (search && !`${p.business_number} ${p.project_name} ${p.client_organization}`.toLowerCase().includes(search)) return false;
+    return true;
+  }).sort((a,b) => {
+    let va=a[projSortKey], vb=b[projSortKey];
+    if (va==null) return 1; if (vb==null) return -1;
+    if (typeof va==='string') va=va.toLowerCase();
+    if (typeof vb==='string') vb=vb.toLowerCase();
+    return projSortAsc ? (va<vb?-1:1) : (va>vb?-1:1);
+  });
+
+  ['business_number','project_name','contract_date','start_date','end_date'].forEach(k => {
+    const el = document.getElementById('sort-'+k);
+    if (el) el.textContent = projSortKey===k ? (projSortAsc?'▲':'▼') : '';
+  });
+
+  document.getElementById('proj-count').textContent = list.length+'件';
+  document.getElementById('proj-table-body').innerHTML = list.length===0
+    ? `<tr><td colspan="15" class="text-center text-muted py-5">案件が見つかりません</td></tr>`
+    : list.map(p => {
+        const days = daysRemaining(p.end_date);
+        const daysTd = days===null ? '-' : days<0 ? `<span class="text-danger fw-bold">${Math.abs(days)}超</span>` : days<=30 ? `<span class="text-warning fw-bold">${days}日</span>` : `${days}日`;
+        const a = p.contract_amount||0;
+        const aStr = a>=1e6 ? Math.round(a/1e4)+'万' : a ? a.toLocaleString() : '-';
+        return `<tr class="${rowClass(p)}">
+          <td class="fw-bold text-primary">${p.business_number}</td>
+          <td style="max-width:200px"><a href="#" onclick="openDetail(${p.id})" class="text-decoration-none text-dark fw-semibold">${p.project_name}</a>
+            ${p.project_type?`<span class="badge bg-light text-secondary ms-1">${p.project_type}</span>`:''}
+          </td>
+          <td class="text-truncate" style="max-width:120px">${p.client_organization||'-'}</td>
+          <td>${p.client_contact||'-'}</td>
+          <td>${fmtDate(p.contract_date,'yy/MM/dd')}</td>
+          <td>${fmtDate(p.start_date,'yy/MM/dd')}</td>
+          <td>${fmtDate(p.end_date,'yy/MM/dd')}</td>
+          <td>${daysTd}</td>
+          <td>${p.person_in_charge||'-'}</td>
+          <td>${p.chief_engineer||'-'}</td>
+          <td>${p.review_engineer||'-'}</td>
+          <td>${progressBar(p.progress_rate||0)}</td>
+          <td class="text-end">${aStr}</td>
+          <td>${statusBadge(p)}</td>
+          <td>
+            <div class="d-flex gap-1">
+              <button class="btn btn-outline-primary btn-sm py-0 px-1" onclick="openDetail(${p.id})">詳細</button>
+              <button class="btn btn-outline-secondary btn-sm py-0 px-1" onclick="openProjectForm(${p.id})">編集</button>
+            </div>
+          </td>
+        </tr>`;
+      }).join('');
+}
+
+function exportCsv() {
+  const headers = ['業務No.','案件名','発注機関','担当者','契約日','工期開始','工期終了','担当','主任技術者','照査技術者','進捗率','ステータス','受注金額'];
+  const rows = projects.map(p=>[p.business_number,p.project_name,p.client_organization,p.client_contact,p.contract_date,p.start_date,p.end_date,p.person_in_charge,p.chief_engineer,p.review_engineer,(p.progress_rate||0)+'%',p.status,p.contract_amount||0]);
+  const csv = [headers,...rows].map(r=>r.map(v=>`"${v??''}"`).join(',')).join('\n');
+  const blob = new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download='案件一覧.csv'; a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ============================================================
+// PROJECT FORM
+// ============================================================
+function openProjectForm(id) {
+  const p = id ? projects.find(x=>x.id===id) : null;
+  document.getElementById('modal-project-title').innerHTML = p
+    ? '<i class="bi bi-pencil-square me-2"></i>案件編集'
+    : '<i class="bi bi-plus-circle me-2"></i>案件登録';
+  const fields = ['business_number','project_name','project_type','status','contract_amount','client_organization','client_contact','contract_date','start_date','end_date','person_in_charge','chief_engineer','review_engineer','notes'];
+  fields.forEach(f => {
+    const el = document.getElementById('f-'+f);
+    if (el) el.value = p ? (p[f]??'') : (f==='status'?'進行中':'');
+  });
+  const pr = p ? (p.progress_rate||0) : 0;
+  document.getElementById('f-progress_rate').value = pr;
+  document.getElementById('f-progress-label').textContent = pr+'%';
+  document.getElementById('f-id').value = id||'';
+  openModal('modal-project');
+}
+
+function saveProject(e) {
+  e.preventDefault();
+  const id = document.getElementById('f-id').value;
+  const fields = ['business_number','project_name','project_type','status','contract_amount','client_organization','client_contact','contract_date','start_date','end_date','person_in_charge','chief_engineer','review_engineer','notes','progress_rate'];
+  const data = {};
+  fields.forEach(f => {
+    const el = document.getElementById('f-'+f);
+    if (el) data[f] = el.value;
+  });
+  data.contract_amount = data.contract_amount ? Number(data.contract_amount) : 0;
+  data.progress_rate = Number(data.progress_rate||0);
+  if (id) {
+    const idx = projects.findIndex(x=>x.id===Number(id));
+    projects[idx] = { ...projects[idx], ...data };
+  } else {
+    data.id = nextId(projects);
+    projects.push(data);
+  }
+  save(KEY_PROJECTS, projects);
+  closeModal('modal-project');
+  if (currentPage==='dashboard') renderDashboard();
+  else if (currentPage==='projects') renderProjectList();
+  else if (currentPage==='engineers') renderEngineers();
+  else if (currentPage==='reports') renderReports();
+  else if (currentPage==='calendar') renderCalendar();
+}
+
+// ============================================================
+// PROJECT DETAIL
+// ============================================================
+function openDetail(id) {
+  const p = projects.find(x=>x.id===id);
+  if (!p) return;
+  const days = daysRemaining(p.end_date);
+  document.getElementById('detail-title').textContent = p.project_name;
+  const projLogs = logs.filter(l=>l.project_id===id).sort((a,b)=>b.log_date.localeCompare(a.log_date));
+  const quickBtns = [0,10,20,30,40,50,60,70,80,90,100].map(v=>`
+    <button onclick="quickProgress(${id},${v})" class="btn btn-sm py-0 px-2 ${p.progress_rate===v?'btn-primary':'btn-outline-secondary'}" style="font-size:.72rem">${v}%</button>`).join('');
+  document.getElementById('detail-content').innerHTML = `
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+      <div>
+        <span class="badge bg-secondary me-1">${p.business_number}</span>
+        ${p.project_type?`<span class="badge bg-info text-dark me-1">${p.project_type}</span>`:''}
+        ${statusBadge(p)}
+      </div>
+      <div class="d-flex gap-2">
+        <button class="btn btn-outline-primary btn-sm" onclick="closeModal('modal-detail');openProjectForm(${id})"><i class="bi bi-pencil me-1"></i>編集</button>
+        <button class="btn btn-outline-danger btn-sm" onclick="deleteProject(${id})"><i class="bi bi-trash me-1"></i>削除</button>
+      </div>
+    </div>
+    <div class="mb-3">
+      <div class="d-flex justify-content-between small mb-1"><span>業務進捗率</span><strong>${p.progress_rate}%</strong></div>
+      <div class="progress mb-2" style="height:16px"><div class="progress-bar ${p.progress_rate>=100?'bg-success':p.progress_rate>=60?'bg-primary':p.progress_rate>=30?'bg-warning':'bg-danger'}" style="width:${Math.min(p.progress_rate,100)}%">${p.progress_rate}%</div></div>
+      <div class="d-flex align-items-center gap-1 flex-wrap"><span class="small text-muted me-1">進捗を更新:</span>${quickBtns}</div>
+    </div>
+    <div class="row g-3">
+      <div class="col-md-5">
+        <div class="card border-0 bg-light mb-3">
+          <div class="card-body p-3">
+            <div class="section-title mb-2">案件詳細</div>
+            <table class="table table-sm mb-0 bg-transparent">
+              <tbody>
+                <tr><th class="text-muted fw-normal" style="width:110px">発注機関</th><td>${p.client_organization||'-'}</td></tr>
+                <tr><th class="text-muted fw-normal">相手先担当</th><td>${p.client_contact||'-'}</td></tr>
+                <tr><th class="text-muted fw-normal">契約日</th><td>${fmtDate(p.contract_date,'yyyy年MM月dd日')}</td></tr>
+                <tr><th class="text-muted fw-normal">工期開始</th><td>${fmtDate(p.start_date,'yyyy年MM月dd日')}</td></tr>
+                <tr><th class="text-muted fw-normal">工期終了</th><td>${fmtDate(p.end_date,'yyyy年MM月dd日')}${days!==null?`<span class="ms-1 badge ${days<0?'bg-danger':days<=30?'bg-warning text-dark':'bg-light text-dark'}">${days<0?Math.abs(days)+'日超過':'残'+days+'日'}</span>`:''}</td></tr>
+                <tr><th class="text-muted fw-normal">受注金額</th><td class="fw-bold">${p.contract_amount?'¥'+p.contract_amount.toLocaleString():'-'}</td></tr>
+                <tr><th class="text-muted fw-normal">担当</th><td>${p.person_in_charge||'-'}</td></tr>
+                <tr><th class="text-muted fw-normal">主任技術者</th><td>${p.chief_engineer||'-'}</td></tr>
+                <tr><th class="text-muted fw-normal">照査技術者</th><td>${p.review_engineer||'-'}</td></tr>
+              </tbody>
+            </table>
+            ${p.notes?`<div class="mt-2 small" style="white-space:pre-wrap">${p.notes}</div>`:''}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-7">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <div class="section-title mb-0">活動履歴</div>
+          <button class="btn btn-sm btn-primary" onclick="openLogForm(${id})"><i class="bi bi-plus me-1"></i>記録追加</button>
+        </div>
+        <div id="log-list-${id}"></div>
+      </div>
+    </div>`;
+  renderLogList(id);
+  openModal('modal-detail');
+}
+
+function renderLogList(projectId) {
+  const el = document.getElementById('log-list-'+projectId);
+  if (!el) return;
+  const projLogs = logs.filter(l=>l.project_id===projectId).sort((a,b)=>b.log_date.localeCompare(a.log_date));
+  el.innerHTML = projLogs.length===0
+    ? '<div class="text-center text-muted small py-3">活動記録がありません</div>'
+    : projLogs.map(log=>`
+      <div class="d-flex gap-2 mb-3">
+        <div class="d-flex flex-column align-items-center">
+          <div class="timeline-dot">${(log.activity_type||'記録').slice(0,2)}</div>
+          <div class="timeline-line"></div>
+        </div>
+        <div class="flex-grow-1 pb-3">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <span class="badge bg-light text-dark border me-1">${log.activity_type}</span>
+              <span class="small text-muted">${fmtDate(log.log_date)}</span>
+              ${log.staff_name?`<span class="small text-muted ms-1">(${log.staff_name})</span>`:''}
+            </div>
+            <button class="btn btn-sm text-danger py-0" onclick="deleteLog(${log.id},${projectId})"><i class="bi bi-trash"></i></button>
+          </div>
+          <p class="mb-1 mt-1 small" style="white-space:pre-wrap">${log.description}</p>
+          ${log.next_action?`<div class="alert alert-info py-1 px-2 mb-0 small"><i class="bi bi-arrow-right-circle me-1"></i><strong>次のアクション:</strong> ${log.next_action}</div>`:''}
+        </div>
+      </div>`).join('');
+}
+
+function quickProgress(id, val) {
+  const idx = projects.findIndex(x=>x.id===id);
+  projects[idx].progress_rate = val;
+  save(KEY_PROJECTS, projects);
+  openDetail(id);
+}
+
+function deleteProject(id) {
+  if (!confirm('この案件を削除してもよいですか？')) return;
+  projects = projects.filter(x=>x.id!==id);
+  logs = logs.filter(l=>l.project_id!==id);
+  save(KEY_PROJECTS, projects);
+  save(KEY_LOGS, logs);
+  closeModal('modal-detail');
+  if (currentPage==='dashboard') renderDashboard();
+  else renderProjectList();
+}
+
+// ============================================================
+// ACTIVITY LOGS
+// ============================================================
+function openLogForm(projectId) {
+  document.getElementById('l-date').value = todayStr();
+  document.getElementById('l-type').value = '打合せ';
+  document.getElementById('l-description').value = '';
+  document.getElementById('l-staff').value = '';
+  document.getElementById('l-next').value = '';
+  document.getElementById('l-project-id').value = projectId;
+  openModal('modal-log');
+}
+
+function saveLog(e) {
+  e.preventDefault();
+  const projectId = Number(document.getElementById('l-project-id').value);
+  const log = {
+    id: nextId(logs),
+    project_id: projectId,
+    log_date: document.getElementById('l-date').value,
+    activity_type: document.getElementById('l-type').value,
+    description: document.getElementById('l-description').value,
+    staff_name: document.getElementById('l-staff').value,
+    next_action: document.getElementById('l-next').value,
+  };
+  logs.push(log);
+  save(KEY_LOGS, logs);
+  closeModal('modal-log');
+  renderLogList(projectId);
+}
+
+function deleteLog(logId, projectId) {
+  if (!confirm('記録を削除しますか？')) return;
+  logs = logs.filter(l=>l.id!==logId);
+  save(KEY_LOGS, logs);
+  renderLogList(projectId);
+}
+
+// ============================================================
+// PIPELINE
+// ============================================================
+const STAGES = ['リード','提案準備','提案済','交渉中','受注','失注'];
+const STAGE_COLORS = { 'リード':'#6b7280','提案準備':'#2563a8','提案済':'#7c3aed','交渉中':'#d97706','受注':'#059669','失注':'#dc2626' };
+
+function renderPipeline() {
+  const active = opportunities.filter(o=>o.stage!=='失注'&&o.stage!=='受注');
+  const totalPotential = active.reduce((s,o)=>s+(o.amount||0),0);
+  const expectedValue = active.reduce((s,o)=>s+((o.amount||0)*(o.probability||0)/100),0);
+  document.getElementById('pipeline-stats').innerHTML = [
+    { label:'商談中案件', value:active.length+'件', icon:'bi-funnel-fill', color:'#2563a8' },
+    { label:'パイプライン総額', value:amountStr(totalPotential), icon:'bi-currency-yen', color:'#7c3aed' },
+    { label:'期待値合計', value:amountStr(expectedValue), icon:'bi-graph-up', color:'#059669' },
+    { label:'受注済', value:opportunities.filter(o=>o.stage==='受注').length+'件', icon:'bi-trophy-fill', color:'#d97706' },
+  ].map(s=>`<div class="col-6 col-md-3">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body d-flex align-items-center gap-3 py-3">
+        <div class="rounded-circle d-flex align-items-center justify-content-center text-white flex-shrink-0" style="width:46px;height:46px;background:${s.color}">
+          <i class="bi ${s.icon} fs-5"></i></div>
+        <div><div class="fs-4 fw-bold lh-1">${s.value}</div><div class="text-muted small">${s.label}</div></div>
+      </div>
+    </div>
+  </div>`).join('');
+
+  document.getElementById('pipeline-kanban').innerHTML = STAGES.map(stage => {
+    const cards = opportunities.filter(o=>o.stage===stage);
+    return `<div class="col-6 col-md-4 col-lg-2">
+      <div class="fw-bold small mb-2 d-flex align-items-center gap-1">
+        <span class="badge" style="background:${STAGE_COLORS[stage]}">${stage}</span>
+        <span class="text-muted">${cards.length}</span>
+      </div>
+      <div class="kanban-col">
+        ${cards.length===0?'<div class="text-muted small text-center py-3">なし</div>':
+          cards.map(o=>`<div class="kanban-card" onclick="openOpportunityForm(${o.id})" style="border-left-color:${STAGE_COLORS[stage]}">
+            <div class="fw-semibold small mb-1">${o.name}</div>
+            ${o.client?`<div class="text-muted" style="font-size:.75rem">${o.client}</div>`:''}
+            <div class="d-flex justify-content-between align-items-center mt-1">
+              <span class="small fw-bold text-primary">${o.amount?Math.round(o.amount/1e4)+'万':'-'}</span>
+              <span class="badge bg-light text-dark border" style="font-size:.7rem">${o.probability||0}%</span>
+            </div>
+            ${o.person?`<div class="text-muted mt-1" style="font-size:.72rem"><i class="bi bi-person me-1"></i>${o.person}</div>`:''}
+          </div>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openOpportunityForm(id) {
+  const o = id ? opportunities.find(x=>x.id===id) : null;
+  document.getElementById('modal-opp-title').innerHTML = o ? '<i class="bi bi-pencil-square me-2"></i>商談編集' : '<i class="bi bi-plus-circle me-2"></i>商談追加';
+  document.getElementById('o-name').value = o ? o.name : '';
+  document.getElementById('o-client').value = o ? o.client||'' : '';
+  document.getElementById('o-stage').value = o ? o.stage||'リード' : 'リード';
+  document.getElementById('o-amount').value = o ? o.amount||'' : '';
+  const prob = o ? (o.probability||50) : 50;
+  document.getElementById('o-prob').value = prob;
+  document.getElementById('o-prob-label').textContent = prob+'%';
+  document.getElementById('o-expected_date').value = o ? o.expected_date||'' : '';
+  document.getElementById('o-person').value = o ? o.person||'' : '';
+  document.getElementById('o-notes').value = o ? o.notes||'' : '';
+  document.getElementById('o-id').value = id||'';
+  openModal('modal-opportunity');
+}
+
+function saveOpportunity(e) {
+  e.preventDefault();
+  const id = document.getElementById('o-id').value;
+  const data = {
+    name: document.getElementById('o-name').value,
+    client: document.getElementById('o-client').value,
+    stage: document.getElementById('o-stage').value,
+    amount: Number(document.getElementById('o-amount').value)||0,
+    probability: Number(document.getElementById('o-prob').value)||0,
+    expected_date: document.getElementById('o-expected_date').value,
+    person: document.getElementById('o-person').value,
+    notes: document.getElementById('o-notes').value,
+  };
+  if (id) {
+    const idx = opportunities.findIndex(x=>x.id===Number(id));
+    opportunities[idx] = { ...opportunities[idx], ...data };
+  } else {
+    data.id = nextId(opportunities);
+    opportunities.push(data);
+  }
+  save(KEY_OPPORTUNITIES, opportunities);
+  closeModal('modal-opportunity');
+  renderPipeline();
+}
+
+// ============================================================
+// ENGINEERS
+// ============================================================
+function renderEngineers() {
+  const active = projects.filter(p=>p.status==='進行中');
+  const engMap = {};
+  active.forEach(p => {
+    [p.person_in_charge, p.chief_engineer, p.review_engineer].filter(Boolean).forEach(name => {
+      if (!engMap[name]) engMap[name] = [];
+      if (!engMap[name].find(x=>x.id===p.id)) engMap[name].push(p);
+    });
+  });
+  const sorted = Object.entries(engMap).sort((a,b)=>b[1].length-a[1].length);
+  if (!sorted.length) {
+    document.getElementById('engineers-content').innerHTML = '<div class="text-center text-muted py-5">進行中の案件がありません</div>';
+    return;
+  }
+  const maxLoad = Math.max(...sorted.map(([,ps])=>ps.length));
+  document.getElementById('engineers-content').innerHTML = `
+    <div class="row g-3">
+      ${sorted.map(([name, ps])=>{
+        const load = ps.length;
+        const pct = maxLoad>0 ? Math.round(load/maxLoad*100) : 0;
+        const badge = load>=4?'<span class="badge bg-danger">高負荷</span>':load>=2?'<span class="badge bg-warning text-dark">やや多</span>':'<span class="badge bg-success">余裕あり</span>';
+        return `<div class="col-lg-6">
+          <div class="card border-0 shadow-sm">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="d-flex align-items-center gap-2">
+                  <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold" style="width:38px;height:38px;flex-shrink:0">${name.slice(-1)}</div>
+                  <span class="fw-bold">${name}</span>
+                </div>
+                <div class="d-flex align-items-center gap-2">${badge}<span class="fw-bold text-primary">${load}件</span></div>
+              </div>
+              <div class="progress mb-3" style="height:12px">
+                <div class="progress-bar ${load>=4?'bg-danger':load>=2?'bg-warning':'bg-success'}" style="width:${pct}%"></div>
+              </div>
+              <div class="small">
+                ${ps.map(p=>`<div class="d-flex justify-content-between align-items-center py-1 border-bottom">
+                  <span class="text-truncate me-2" style="max-width:200px">${p.project_name}</span>
+                  <div class="d-flex align-items-center gap-1 flex-shrink-0">
+                    ${progressBar(p.progress_rate||0,6)}
+                    ${statusBadge(p)}
+                  </div>
+                </div>`).join('')}
+              </div>
+            </div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+}
+
+// ============================================================
+// CALENDAR
+// ============================================================
+function calPrev() { calMonth--; if (calMonth<0){calMonth=11;calYear--;} renderCalendar(); }
+function calNext() { calMonth++; if (calMonth>11){calMonth=0;calYear++;} renderCalendar(); }
+
+function renderCalendar() {
+  document.getElementById('cal-month-label').textContent = `${calYear}年${calMonth+1}月`;
+  const first = new Date(calYear, calMonth, 1);
+  const last = new Date(calYear, calMonth+1, 0);
+  const startDow = first.getDay();
+  const todayLocal = todayStr();
+
+  // Build event map
+  const eventMap = {};
+  projects.forEach(p=>{
+    if (p.end_date) { eventMap[p.end_date] = eventMap[p.end_date]||[]; eventMap[p.end_date].push({label:p.project_name,cls:'cal-event-end',type:'end'}); }
+    if (p.start_date) { eventMap[p.start_date] = eventMap[p.start_date]||[]; eventMap[p.start_date].push({label:p.project_name,cls:'cal-event-start',type:'start'}); }
+    if (p.contract_date) { eventMap[p.contract_date] = eventMap[p.contract_date]||[]; eventMap[p.contract_date].push({label:p.project_name,cls:'cal-event-contract',type:'contract'}); }
+  });
+
+  const cells = [];
+  // Leading blanks
+  for (let i=0;i<startDow;i++) cells.push(null);
+  // Days of month
+  for (let d=1;d<=last.getDate();d++) cells.push(new Date(calYear,calMonth,d));
+  // Trailing blanks
+  while (cells.length%7!==0) cells.push(null);
+
+  document.getElementById('cal-grid').innerHTML = cells.map(dt => {
+    if (!dt) return '<div class="cal-cell other-month"></div>';
+    const ds = dt.toISOString().slice(0,10);
+    const isToday = ds===todayLocal;
+    const evts = eventMap[ds]||[];
+    return `<div class="cal-cell ${isToday?'today':''}">
+      <div class="fw-bold mb-1 ${isToday?'text-primary':''}" style="font-size:.8rem">${dt.getDate()}</div>
+      ${evts.map(ev=>`<div class="cal-event ${ev.cls}" title="${ev.label}">${ev.label}</div>`).join('')}
+    </div>`;
+  }).join('');
+
+  // Upcoming deadlines
+  const upcoming = projects.filter(p=>{
+    if (!p.end_date||p.status==='完了'||p.status==='中断') return false;
+    const d=daysRemaining(p.end_date); return d!==null&&d>=0&&d<=60;
+  }).sort((a,b)=>a.end_date.localeCompare(b.end_date));
+  document.getElementById('cal-upcoming').innerHTML = upcoming.length===0
+    ? '<div class="text-muted small text-center py-3">なし</div>'
+    : upcoming.map(p=>{
+        const d=daysRemaining(p.end_date);
+        return `<div class="border-bottom pb-2 mb-2">
+          <div class="small fw-semibold">${p.project_name}</div>
+          <div class="d-flex justify-content-between">
+            <span class="text-muted" style="font-size:.75rem">${fmtDate(p.end_date,'MM/dd')}</span>
+            <span class="badge ${d<=7?'bg-danger':d<=30?'bg-warning text-dark':'bg-light text-dark'}" style="font-size:.7rem">残${d}日</span>
+          </div>
+        </div>`;
+      }).join('');
+}
+
+// ============================================================
+// REPORTS
+// ============================================================
+let chartMonthly = null, chartType = null;
+
+function renderReports() {
+  const yearEl = document.getElementById('report-year');
+  const years = [...new Set(projects.map(p=>p.contract_date?new Date(p.contract_date).getFullYear():null).filter(Boolean))].sort((a,b)=>b-a);
+  if (!years.length) years.push(new Date().getFullYear());
+  const curYear = Number(yearEl.value)||years[0];
+  yearEl.innerHTML = years.map(y=>`<option value="${y}" ${y===curYear?'selected':''}>${y}年</option>`).join('');
+
+  const inYear = projects.filter(p=>p.contract_date&&new Date(p.contract_date).getFullYear()===curYear);
+  const totalAmt = inYear.reduce((s,p)=>s+(p.contract_amount||0),0);
+  const active = projects.filter(p=>p.status==='進行中');
+  const activeAmt = active.reduce((s,p)=>s+(p.contract_amount||0),0);
+
+  document.getElementById('report-kpis').innerHTML = [
+    { label:`${curYear}年 受注総額`, value:amountStr(totalAmt), icon:'bi-currency-yen', color:'#2563a8' },
+    { label:`${curYear}年 受注件数`, value:inYear.length+'件', icon:'bi-folder2-open', color:'#059669' },
+    { label:'進行中 受注額', value:amountStr(activeAmt), icon:'bi-play-circle-fill', color:'#7c3aed' },
+    { label:'平均受注金額', value:inYear.length?amountStr(Math.round(totalAmt/inYear.length)):'-', icon:'bi-graph-up', color:'#d97706' },
+  ].map(s=>`<div class="col-6 col-md-3">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body d-flex align-items-center gap-3 py-3">
+        <div class="rounded-circle d-flex align-items-center justify-content-center text-white flex-shrink-0" style="width:44px;height:44px;background:${s.color}">
+          <i class="bi ${s.icon}"></i></div>
+        <div><div class="fs-5 fw-bold lh-1">${s.value}</div><div class="text-muted small">${s.label}</div></div>
+      </div>
+    </div>
+  </div>`).join('');
+
+  // Monthly bar chart
+  const monthlyData = Array(12).fill(0);
+  inYear.forEach(p=>{
+    const m = new Date(p.contract_date).getMonth();
+    monthlyData[m] += (p.contract_amount||0);
+  });
+
+  if (chartMonthly) chartMonthly.destroy();
+  chartMonthly = new Chart(document.getElementById('chart-monthly'), {
+    type: 'bar',
+    data: {
+      labels: ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'],
+      datasets: [{
+        label: '受注金額（万円）',
+        data: monthlyData.map(v=>Math.round(v/1e4)),
+        backgroundColor: '#2563a8cc',
+        borderRadius: 6,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend:{display:false}, title:{display:true,text:`${curYear}年 月別受注金額`,font:{size:14,weight:'bold'}} },
+      scales: { y:{beginAtZero:true, ticks:{callback:v=>v+'万'}} }
+    }
+  });
+
+  // Type doughnut
+  const typeMap = {};
+  inYear.forEach(p=>{
+    const t=p.project_type||'その他';
+    typeMap[t]=(typeMap[t]||0)+(p.contract_amount||0);
+  });
+  const typeLabels = Object.keys(typeMap);
+  const typeData = typeLabels.map(k=>Math.round(typeMap[k]/1e4));
+  const palette = ['#2563a8','#059669','#7c3aed','#d97706','#dc2626','#0891b2','#65a30d','#db2777','#9333ea','#ea580c'];
+
+  if (chartType) chartType.destroy();
+  chartType = new Chart(document.getElementById('chart-type'), {
+    type: 'doughnut',
+    data: {
+      labels: typeLabels,
+      datasets: [{ data: typeData, backgroundColor: palette.slice(0,typeLabels.length), borderWidth:2 }]
+    },
+    options: {
+      responsive: true,
+      plugins: { title:{display:true,text:'業務種別構成',font:{size:14,weight:'bold'}}, legend:{position:'bottom',labels:{font:{size:11}}} }
+    }
+  });
+}
+
+// ============================================================
+// INIT
+// ============================================================
+document.getElementById('copy-year').textContent = new Date().getFullYear();
+showPage('dashboard');
+</script>
+</body>
+</html>
