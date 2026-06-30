@@ -3,9 +3,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./bridge_management.db")
+DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///./project_management.db")
 
-# Render の PostgreSQL URL は "postgres://" で始まるため SQLAlchemy 用に修正
+# Render の PostgreSQL URL は "postgres://" で始まるが SQLAlchemy 2.x は非対応のため変換
 if DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 

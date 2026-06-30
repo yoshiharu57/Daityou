@@ -1,147 +1,116 @@
-from pydantic import BaseModel, Field
-from typing import Optional, List
+from pydantic import BaseModel
+from typing import Optional, List, Dict, Any
 from datetime import date, datetime
 
 
-class DamageRecordBase(BaseModel):
-    member_type: Optional[str] = None
-    member_number: Optional[str] = None
-    damage_type: Optional[str] = None
-    damage_rating: Optional[str] = None
-    damage_extent: Optional[str] = None
-    description: Optional[str] = None
-    repair_method: Optional[str] = None
-
-
-class DamageRecordCreate(DamageRecordBase):
-    pass
-
-
-class DamageRecord(DamageRecordBase):
-    id: int
-    inspection_id: int
-
-    class Config:
-        from_attributes = True
-
-
-class PhotoBase(BaseModel):
-    caption: Optional[str] = None
-    photo_type: Optional[str] = None
-    member_type: Optional[str] = None
-    damage_type: Optional[str] = None
-
-
-class PhotoCreate(PhotoBase):
-    pass
-
-
-class Photo(PhotoBase):
-    id: int
-    inspection_id: int
-    filename: str
-    original_filename: Optional[str] = None
-    taken_at: Optional[datetime] = None
-    uploaded_at: Optional[datetime] = None
-
-    class Config:
-        from_attributes = True
-
-
-class InspectionBase(BaseModel):
-    inspection_date: date
-    inspection_type: Optional[str] = "定期点検"
-    inspector_company: Optional[str] = None
-    inspector_name: Optional[str] = None
-    health_rating: Optional[str] = "未判定"
-    overall_findings: Optional[str] = None
-    repair_urgency: Optional[str] = None
-    next_inspection_date: Optional[date] = None
-
-
-class InspectionCreate(InspectionBase):
-    bridge_id: int
-
-
-class InspectionUpdate(InspectionBase):
-    pass
-
-
-class Inspection(InspectionBase):
-    id: int
-    bridge_id: int
-    created_at: Optional[datetime] = None
-    damage_records: List[DamageRecord] = []
-    photos: List[Photo] = []
-
-    class Config:
-        from_attributes = True
-
-
-class InspectionSummary(BaseModel):
-    id: int
-    bridge_id: int
-    inspection_date: date
-    inspection_type: Optional[str] = None
-    health_rating: Optional[str] = None
-    inspector_company: Optional[str] = None
-
-    class Config:
-        from_attributes = True
-
-
-class BridgeBase(BaseModel):
-    management_number: str
-    bridge_name: str
-    bridge_name_kana: Optional[str] = None
-    road_name: Optional[str] = None
-    location: Optional[str] = None
-    latitude: Optional[float] = None
-    longitude: Optional[float] = None
-    bridge_length: Optional[float] = None
-    width: Optional[float] = None
-    structure_type: Optional[str] = None
-    superstructure_type: Optional[str] = None
-    substructure_type: Optional[str] = None
-    material: Optional[str] = None
-    year_built: Optional[int] = None
-    road_class: Optional[str] = None
-    administrator: Optional[str] = None
+class OpportunityBase(BaseModel):
+    opportunity_name: str
+    client_organization: Optional[str] = None
+    client_contact: Optional[str] = None
+    bid_date: Optional[date] = None
+    estimated_amount: Optional[float] = 0
+    win_probability: Optional[int] = 50
+    stage: Optional[str] = "情報収集"
+    project_type: Optional[str] = None
+    person_in_charge: Optional[str] = None
+    competitor: Optional[str] = None
     notes: Optional[str] = None
 
 
-class BridgeCreate(BridgeBase):
+class OpportunityCreate(OpportunityBase):
     pass
 
 
-class BridgeUpdate(BridgeBase):
-    management_number: Optional[str] = None
-    bridge_name: Optional[str] = None
+class OpportunityUpdate(BaseModel):
+    opportunity_name: Optional[str] = None
+    client_organization: Optional[str] = None
+    client_contact: Optional[str] = None
+    bid_date: Optional[date] = None
+    estimated_amount: Optional[float] = None
+    win_probability: Optional[int] = None
+    stage: Optional[str] = None
+    project_type: Optional[str] = None
+    person_in_charge: Optional[str] = None
+    competitor: Optional[str] = None
+    notes: Optional[str] = None
 
 
-class Bridge(BridgeBase):
+class OpportunityResponse(OpportunityBase):
     id: int
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
-    inspections: List[InspectionSummary] = []
 
     class Config:
         from_attributes = True
 
 
-class BridgeListItem(BaseModel):
+class ProjectBase(BaseModel):
+    business_number: str
+    project_name: str
+    client_organization: Optional[str] = None
+    client_contact: Optional[str] = None
+    contract_date: Optional[date] = None
+    start_date: Optional[date] = None
+    end_date: Optional[date] = None
+    contract_amount: Optional[float] = 0
+    project_type: Optional[str] = None
+    person_in_charge: Optional[str] = None
+    chief_engineer: Optional[str] = None
+    review_engineer: Optional[str] = None
+    progress_rate: Optional[int] = 0
+    status: Optional[str] = "進行中"
+    notes: Optional[str] = None
+
+
+class ProjectCreate(ProjectBase):
+    pass
+
+
+class ProjectUpdate(BaseModel):
+    business_number: Optional[str] = None
+    project_name: Optional[str] = None
+    client_organization: Optional[str] = None
+    client_contact: Optional[str] = None
+    contract_date: Optional[date] = None
+    start_date: Optional[date] = None
+    end_date: Optional[date] = None
+    contract_amount: Optional[float] = None
+    project_type: Optional[str] = None
+    person_in_charge: Optional[str] = None
+    chief_engineer: Optional[str] = None
+    review_engineer: Optional[str] = None
+    progress_rate: Optional[int] = None
+    status: Optional[str] = None
+    notes: Optional[str] = None
+
+
+class ProjectResponse(ProjectBase):
     id: int
-    management_number: str
-    bridge_name: str
-    bridge_name_kana: Optional[str] = None
-    road_name: Optional[str] = None
-    location: Optional[str] = None
-    latitude: Optional[float] = None
-    longitude: Optional[float] = None
-    last_inspection_date: Optional[date] = None
-    last_health_rating: Optional[str] = None
-    next_inspection_date: Optional[date] = None
-    inspection_count: int = 0
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True
+
+
+class ActivityLogBase(BaseModel):
+    project_id: int
+    log_date: date
+    activity_type: Optional[str] = None
+    description: str
+    staff_name: Optional[str] = None
+    next_action: Optional[str] = None
+
+
+class ActivityLogCreate(ActivityLogBase):
+    pass
+
+
+class ActivityLogResponse(ActivityLogBase):
+    id: int
+    created_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+

@@ -6,7 +6,7 @@ import os
 
 from database import engine
 import models
-from routers import bridges, inspections, photos
+from routers import projects, activity_logs, opportunities
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -23,8 +23,8 @@ def _seed_if_empty():
 _seed_if_empty()
 
 app = FastAPI(
-    title="橋梁管理システム",
-    description="市区町村向け橋梁データベース管理システム",
+    title="建設コンサルタント案件管理システム",
+    description="営業職向け受注案件管理システム",
     version="1.0.0"
 )
 
@@ -36,14 +36,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(bridges.router)
-app.include_router(inspections.router)
-app.include_router(photos.router)
+app.include_router(projects.router)
+app.include_router(activity_logs.router)
+app.include_router(opportunities.router)
 
 
 @app.get("/health")
 def health_check():
-    return {"status": "ok", "message": "橋梁管理システムが稼働中です"}
+    return {"status": "ok", "message": "案件管理システムが稼働中です"}
 
 
 frontend_build = os.path.join(os.path.dirname(__file__), "..", "frontend", "dist")
