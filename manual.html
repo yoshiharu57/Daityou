@@ -1,0 +1,874 @@
+<title>操作説明書 — 建設コンサル 案件管理システム</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+/* ── Tokens (light) ── */
+:root {
+  --navy:       #1a3a5c;
+  --navy-dark:  #0f2540;
+  --navy-mid:   #254d75;
+  --blue:       #2563a8;
+  --blue-light: #dbeafe;
+  --gold:       #f59e0b;
+  --gold-light: #fffbeb;
+  --gold-mid:   #fef3c7;
+  --red-light:  #fef2f2;
+  --red-mid:    #fecaca;
+  --red:        #dc2626;
+  --green-light:#f0fdf4;
+  --green:      #16a34a;
+  --body-text:  #2d3a4a;
+  --muted:      #6b7f96;
+  --rule:       #e2eaf4;
+  --bg:         #f7faff;
+  --bg-card:    #ffffff;
+  --sidebar-bg: #1a3a5c;
+  --sidebar-text: rgba(255,255,255,.85);
+  --sidebar-active: rgba(255,255,255,.12);
+  --sidebar-hover:  rgba(255,255,255,.07);
+  --code-bg:    #eef3fb;
+  --badge-blue: #2563a8;
+  --shadow:     0 1px 4px rgba(26,58,92,.08);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --body-text:  #c8d8ea;
+    --muted:      #7e95ad;
+    --rule:       #1e3150;
+    --bg:         #0e1e30;
+    --bg-card:    #132540;
+    --sidebar-bg: #0a1828;
+    --blue-light: #1e3a6e;
+    --gold-light: #292010;
+    --gold-mid:   #3a2d0a;
+    --red-light:  #2a0f0f;
+    --red-mid:    #5c1a1a;
+    --green-light:#0d2218;
+    --code-bg:    #0d1e30;
+    --shadow:     0 1px 4px rgba(0,0,0,.3);
+  }
+}
+:root[data-theme="light"] {
+  --body-text:  #2d3a4a; --muted: #6b7f96; --rule: #e2eaf4;
+  --bg: #f7faff; --bg-card: #ffffff; --sidebar-bg: #1a3a5c;
+  --blue-light: #dbeafe; --gold-light: #fffbeb; --gold-mid: #fef3c7;
+  --red-light: #fef2f2; --red-mid: #fecaca; --green-light: #f0fdf4;
+  --code-bg: #eef3fb; --shadow: 0 1px 4px rgba(26,58,92,.08);
+}
+:root[data-theme="dark"] {
+  --body-text: #c8d8ea; --muted: #7e95ad; --rule: #1e3150;
+  --bg: #0e1e30; --bg-card: #132540; --sidebar-bg: #0a1828;
+  --blue-light: #1e3a6e; --gold-light: #292010; --gold-mid: #3a2d0a;
+  --red-light: #2a0f0f; --red-mid: #5c1a1a; --green-light: #0d2218;
+  --code-bg: #0d1e30; --shadow: 0 1px 4px rgba(0,0,0,.3);
+}
+
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 14px; }
+body {
+  font-family: 'Hiragino Kaku Gothic Pro','Yu Gothic Medium','Yu Gothic','Meiryo','Noto Sans JP',sans-serif;
+  background: var(--bg);
+  color: var(--body-text);
+  line-height: 1.75;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--blue); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ── Layout ── */
+.layout {
+  display: grid;
+  grid-template-columns: 230px 1fr;
+  min-height: 100vh;
+}
+
+/* ── Sidebar ── */
+.sidebar {
+  background: var(--sidebar-bg);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+.sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,.15); border-radius: 2px; }
+
+.sidebar-header {
+  padding: 1.4rem 1.2rem 1rem;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+.sidebar-logo {
+  display: flex; align-items: center; gap: .55rem;
+  margin-bottom: .55rem;
+}
+.sidebar-icon {
+  width: 32px; height: 32px; background: var(--gold);
+  border-radius: 7px; display: flex; align-items: center;
+  justify-content: center; font-size: .95rem; flex-shrink: 0;
+}
+.sidebar-title {
+  font-size: .8rem; font-weight: 700; color: #fff;
+  line-height: 1.3;
+}
+.sidebar-ver {
+  font-size: .68rem; color: rgba(255,255,255,.4);
+  letter-spacing: .06em;
+}
+
+.toc { padding: .6rem 0; flex: 1; }
+.toc-section { margin-bottom: .2rem; }
+.toc-heading {
+  font-size: .63rem; font-weight: 700;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: rgba(255,255,255,.35);
+  padding: .8rem 1.2rem .25rem;
+}
+.toc-link {
+  display: flex; align-items: center; gap: .5rem;
+  padding: .38rem 1.2rem;
+  font-size: .78rem;
+  color: var(--sidebar-text);
+  border-left: 2px solid transparent;
+  transition: background .15s, border-color .15s;
+  cursor: pointer;
+  text-decoration: none;
+}
+.toc-link:hover {
+  background: var(--sidebar-hover);
+  text-decoration: none;
+  color: #fff;
+}
+.toc-link.active {
+  background: var(--sidebar-active);
+  border-left-color: var(--gold);
+  color: #fff;
+  font-weight: 600;
+}
+.toc-num {
+  font-size: .65rem; font-weight: 700;
+  width: 18px; height: 18px;
+  background: rgba(255,255,255,.1);
+  border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Main content ── */
+.main {
+  padding: 2.5rem 3rem 4rem;
+  max-width: 820px;
+}
+
+/* ── Page header ── */
+.page-header {
+  margin-bottom: 2.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid var(--rule);
+}
+.page-eyebrow {
+  font-size: .68rem; font-weight: 700;
+  letter-spacing: .16em; text-transform: uppercase;
+  color: var(--blue); margin-bottom: .5rem;
+}
+.page-title {
+  font-size: 1.9rem; font-weight: 900;
+  color: var(--navy); line-height: 1.2;
+  text-wrap: balance;
+  margin-bottom: .5rem;
+}
+:root[data-theme="dark"] .page-title,
+@media (prefers-color-scheme: dark) { .page-title { color: #e8f1fb; } }
+.page-meta {
+  font-size: .78rem; color: var(--muted);
+  display: flex; gap: 1.5rem; flex-wrap: wrap;
+}
+
+/* ── Sections ── */
+.doc-section {
+  margin-bottom: 3rem;
+  scroll-margin-top: 1.5rem;
+}
+.section-title {
+  font-size: 1.15rem; font-weight: 800;
+  color: var(--navy);
+  display: flex; align-items: center; gap: .65rem;
+  margin-bottom: 1.2rem;
+  padding-bottom: .6rem;
+  border-bottom: 2px solid var(--rule);
+  text-wrap: balance;
+}
+.section-num {
+  width: 28px; height: 28px;
+  background: var(--blue);
+  color: #fff;
+  border-radius: 6px;
+  font-size: .8rem; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+.subsection-title {
+  font-size: .95rem; font-weight: 700;
+  color: var(--navy);
+  margin: 1.4rem 0 .7rem;
+  display: flex; align-items: center; gap: .5rem;
+}
+.subsection-title::before {
+  content: '';
+  width: 3px; height: 1rem;
+  background: var(--gold);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+p { margin-bottom: .8rem; font-size: .9rem; line-height: 1.78; }
+p:last-child { margin-bottom: 0; }
+
+/* ── Steps ── */
+.steps { display: flex; flex-direction: column; gap: .6rem; margin: .8rem 0 1rem; }
+.step-item {
+  display: flex; gap: .9rem; align-items: flex-start;
+}
+.step-n {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--blue); color: #fff;
+  font-size: .75rem; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: .05rem;
+  font-variant-numeric: tabular-nums;
+}
+.step-body { flex: 1; font-size: .88rem; padding-top: .15rem; line-height: 1.7; }
+.step-body strong { color: var(--navy); font-weight: 700; }
+
+/* ── Callout boxes ── */
+.callout {
+  border-radius: 8px;
+  padding: .85rem 1.1rem;
+  margin: 1rem 0;
+  display: flex; gap: .75rem; align-items: flex-start;
+  font-size: .85rem; line-height: 1.7;
+}
+.callout-icon { font-size: 1rem; flex-shrink: 0; margin-top: .1rem; }
+.callout-body { flex: 1; }
+.callout-body strong { display: block; margin-bottom: .2rem; font-size: .82rem; font-weight: 700; }
+.callout.tip { background: var(--gold-light); border-left: 3px solid var(--gold); }
+.callout.tip .callout-icon::after { content: '💡'; }
+.callout.tip .callout-body strong { color: #92400e; }
+.callout.note { background: var(--blue-light); border-left: 3px solid var(--blue); }
+.callout.note .callout-icon::after { content: 'ℹ️'; }
+.callout.note .callout-body strong { color: var(--blue); }
+.callout.warn { background: var(--red-light); border-left: 3px solid var(--red); }
+.callout.warn .callout-icon::after { content: '⚠️'; }
+.callout.warn .callout-body strong { color: var(--red); }
+.callout.ok { background: var(--green-light); border-left: 3px solid var(--green); }
+.callout.ok .callout-icon::after { content: '✅'; }
+.callout.ok .callout-body strong { color: #14532d; }
+
+/* ── UI mockup chips / badges ── */
+.ui-btn {
+  display: inline-flex; align-items: center; gap: .3rem;
+  background: var(--blue); color: #fff;
+  border-radius: 5px; padding: .18rem .6rem;
+  font-size: .75rem; font-weight: 700;
+  vertical-align: middle; white-space: nowrap;
+}
+.ui-btn.outline { background: transparent; color: var(--blue); border: 1px solid var(--blue); }
+.ui-btn.success { background: #059669; }
+.ui-btn.danger  { background: var(--red); }
+.ui-btn.secondary { background: #6b7280; }
+.ui-badge {
+  display: inline-block;
+  padding: .1rem .55rem; border-radius: 20px;
+  font-size: .72rem; font-weight: 700;
+  vertical-align: middle; white-space: nowrap;
+}
+.ui-badge.primary   { background: #dbeafe; color: #1e40af; }
+.ui-badge.danger    { background: #fee2e2; color: #991b1b; }
+.ui-badge.warning   { background: #fef9c3; color: #854d0e; }
+.ui-badge.success   { background: #dcfce7; color: #14532d; }
+.ui-badge.secondary { background: #f3f4f6; color: #374151; }
+
+/* ── Screen mockup blocks ── */
+.screen-mock {
+  background: var(--bg-card);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 1rem 0;
+  box-shadow: var(--shadow);
+}
+.mock-titlebar {
+  background: var(--navy);
+  padding: .45rem .8rem;
+  font-size: .72rem; color: rgba(255,255,255,.7);
+  font-weight: 600; letter-spacing: .04em;
+  display: flex; align-items: center; gap: .4rem;
+}
+.mock-titlebar::before { content: '■'; color: var(--gold); font-size: .6rem; }
+.mock-body { padding: .8rem 1rem; font-size: .8rem; }
+.mock-row {
+  display: flex; align-items: center;
+  padding: .35rem 0; border-bottom: 1px solid var(--rule);
+  gap: .6rem;
+}
+.mock-row:last-child { border-bottom: none; }
+.mock-col-no { width: 70px; font-weight: 700; color: var(--blue); font-size: .75rem; }
+.mock-col-name { flex: 1; font-weight: 600; color: var(--body-text); }
+.mock-col-date { width: 80px; color: var(--muted); font-size: .75rem; }
+.mock-col-prog { width: 100px; }
+.prog-bar-wrap { height: 6px; background: var(--rule); border-radius: 3px; overflow: hidden; }
+.prog-bar { height: 100%; border-radius: 3px; }
+.mock-alert {
+  background: #fee2e2; border-left: 3px solid var(--red);
+  padding: .45rem .75rem; border-radius: 4px;
+  font-size: .78rem; color: #991b1b; font-weight: 600;
+  margin-bottom: .5rem; display: flex; align-items: center; gap: .4rem;
+}
+.mock-alert::before { content: '⚠'; }
+.mock-stat-row {
+  display: grid; grid-template-columns: repeat(4,1fr); gap: .5rem;
+  margin-bottom: .5rem;
+}
+.mock-stat {
+  background: var(--bg); border: 1px solid var(--rule);
+  border-radius: 6px; padding: .4rem .5rem; text-align: center;
+}
+.mock-stat-val { font-size: 1.1rem; font-weight: 900; color: var(--navy); font-variant-numeric: tabular-nums; }
+.mock-stat-lbl { font-size: .65rem; color: var(--muted); }
+
+/* ── Field table ── */
+.field-table { width: 100%; border-collapse: collapse; font-size: .82rem; margin: .8rem 0; }
+.field-table th {
+  background: var(--navy); color: #fff;
+  padding: .5rem .8rem; text-align: left;
+  font-weight: 700; font-size: .75rem;
+}
+.field-table td { padding: .5rem .8rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
+.field-table tr:last-child td { border-bottom: none; }
+.field-table .req { color: var(--red); font-weight: 700; }
+.field-name { font-weight: 700; color: var(--navy); }
+
+/* ── Color legend ── */
+.color-legend { display: flex; flex-direction: column; gap: .45rem; margin: .6rem 0; }
+.cl-item {
+  display: flex; align-items: center; gap: .75rem;
+  font-size: .84rem;
+}
+.cl-swatch {
+  width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0;
+}
+
+/* ── FAQ ── */
+.faq-item {
+  border: 1px solid var(--rule); border-radius: 8px;
+  margin-bottom: .7rem; overflow: hidden;
+}
+.faq-q {
+  padding: .8rem 1.1rem; font-weight: 700; font-size: .88rem;
+  display: flex; align-items: center; gap: .6rem;
+  cursor: pointer; user-select: none;
+  background: var(--bg-card);
+}
+.faq-q::before { content: 'Q'; background: var(--blue); color: #fff; font-size: .7rem; font-weight: 900; width: 20px; height: 20px; border-radius: 4px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.faq-a {
+  padding: .75rem 1.1rem .75rem 2.8rem;
+  font-size: .85rem; background: var(--blue-light);
+  border-top: 1px solid var(--rule); color: var(--body-text);
+  line-height: 1.7;
+}
+
+/* ── Print ── */
+@media print {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar { display: none; }
+  .main { padding: 1rem; max-width: 100%; }
+}
+
+/* ── Responsive ── */
+@media (max-width: 700px) {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar { position: static; height: auto; }
+  .main { padding: 1.5rem 1.2rem; }
+  .mock-stat-row { grid-template-columns: repeat(2,1fr); }
+}
+
+/* dark mode text fixes */
+@media (prefers-color-scheme: dark) {
+  .page-title { color: #e8f1fb; }
+  .section-title { color: #c8d8ea; }
+  .subsection-title { color: #c8d8ea; }
+  .field-name { color: #c8d8ea; }
+  .mock-col-name { color: #c8d8ea; }
+  .mock-stat-val { color: #c8d8ea; }
+  .faq-q { color: #c8d8ea; }
+}
+:root[data-theme="dark"] .page-title,
+:root[data-theme="dark"] .section-title,
+:root[data-theme="dark"] .subsection-title,
+:root[data-theme="dark"] .field-name,
+:root[data-theme="dark"] .mock-col-name,
+:root[data-theme="dark"] .mock-stat-val,
+:root[data-theme="dark"] .faq-q { color: #c8d8ea; }
+</style>
+
+<div class="layout">
+
+<!-- ── SIDEBAR ── -->
+<nav class="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">
+      <div class="sidebar-icon">📋</div>
+      <div>
+        <div class="sidebar-title">案件管理システム</div>
+        <div class="sidebar-ver">操作説明書 ver 1.0</div>
+      </div>
+    </div>
+  </div>
+  <div class="toc">
+    <div class="toc-section">
+      <div class="toc-heading">導入</div>
+      <a class="toc-link active" href="#s1"><span class="toc-num">1</span>はじめに</a>
+      <a class="toc-link" href="#s2"><span class="toc-num">2</span>起動方法</a>
+      <a class="toc-link" href="#s3"><span class="toc-num">3</span>画面構成</a>
+    </div>
+    <div class="toc-section">
+      <div class="toc-heading">基本操作</div>
+      <a class="toc-link" href="#s4"><span class="toc-num">4</span>ダッシュボード</a>
+      <a class="toc-link" href="#s5"><span class="toc-num">5</span>案件の登録</a>
+      <a class="toc-link" href="#s6"><span class="toc-num">6</span>案件の編集・削除</a>
+      <a class="toc-link" href="#s7"><span class="toc-num">7</span>活動記録</a>
+      <a class="toc-link" href="#s8"><span class="toc-num">8</span>案件一覧</a>
+    </div>
+    <div class="toc-section">
+      <div class="toc-heading">応用機能</div>
+      <a class="toc-link" href="#s9"><span class="toc-num">9</span>パイプライン管理</a>
+      <a class="toc-link" href="#s10"><span class="toc-num">10</span>技術者稼働状況</a>
+      <a class="toc-link" href="#s11"><span class="toc-num">11</span>案件カレンダー</a>
+      <a class="toc-link" href="#s12"><span class="toc-num">12</span>売上分析</a>
+    </div>
+    <div class="toc-section">
+      <div class="toc-heading">データ管理</div>
+      <a class="toc-link" href="#s13"><span class="toc-num">13</span>バックアップ</a>
+      <a class="toc-link" href="#s14"><span class="toc-num">14</span>よくある質問</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ── MAIN ── -->
+<main class="main">
+
+  <div class="page-header">
+    <div class="page-eyebrow">User Manual</div>
+    <h1 class="page-title">建設コンサル 案件管理システム<br>操作説明書</h1>
+    <div class="page-meta">
+      <span>対象バージョン: 1.0</span>
+      <span>対象ファイル: construction-pm.html</span>
+      <span>動作環境: Chrome / Firefox / Safari / Edge</span>
+    </div>
+  </div>
+
+  <!-- 1 はじめに -->
+  <section class="doc-section" id="s1">
+    <h2 class="section-title"><span class="section-num">1</span>はじめに</h2>
+    <p>本システムは、建設コンサルタント会社の営業職が受注案件を一元管理するためのツールです。案件の工期・進捗・担当技術者・受注金額を記録し、期限超過のリスクを早期に把握できます。</p>
+
+    <h3 class="subsection-title">主な特長</h3>
+    <div class="callout ok"><span class="callout-icon"></span><div class="callout-body"><strong>インストール不要・完全無料</strong>HTMLファイル（construction-pm.html）をブラウザで開くだけで使用できます。サーバーやインターネット接続は一切不要です。</div></div>
+    <div class="callout ok"><span class="callout-icon"></span><div class="callout-body"><strong>データは自動保存</strong>入力したデータはブラウザの「localStorage」に自動保存されます。次回ブラウザを開いても、データはそのまま残ります。</div></div>
+    <div class="callout note"><span class="callout-icon"></span><div class="callout-body"><strong>動作確認済みブラウザ</strong>Google Chrome、Mozilla Firefox、Microsoft Edge、Safari（最新版）で動作確認済みです。Internet Explorerには対応していません。</div></div>
+  </section>
+
+  <!-- 2 起動方法 -->
+  <section class="doc-section" id="s2">
+    <h2 class="section-title"><span class="section-num">2</span>起動方法</h2>
+
+    <h3 class="subsection-title">ファイルのダウンロード</h3>
+    <div class="steps">
+      <div class="step-item"><div class="step-n">1</div><div class="step-body">GitHub（<strong>github.com/yoshiharu57/Daityou</strong>）をブラウザで開きます。</div></div>
+      <div class="step-item"><div class="step-n">2</div><div class="step-body">ファイル一覧から <strong>construction-pm.html</strong> をクリックします。</div></div>
+      <div class="step-item"><div class="step-n">3</div><div class="step-body">右上の「<strong>Raw</strong>」ボタンをクリックし、表示されたページ上で <strong>右クリック → 「名前を付けて保存」</strong> を選んでダウンロードします。</div></div>
+      <div class="step-item"><div class="step-n">4</div><div class="step-body">ダウンロードした <strong>construction-pm.html</strong> をダブルクリックすると、ブラウザで自動的に開きます。</div></div>
+    </div>
+
+    <div class="callout tip"><span class="callout-icon"></span><div class="callout-body"><strong>ファイルはどこに置いてもOK</strong>デスクトップ・ドキュメントフォルダなど、任意の場所に保存して使用できます。ファイルを移動してもデータは失われません（データはブラウザに保存されます）。</div></div>
+
+    <h3 class="subsection-title">初回起動時</h3>
+    <p>はじめてファイルを開くと、操作方法をすぐに理解できるよう <strong>サンプルデータ（5件の案件・商談・活動記録）</strong> が自動的に投入されます。実際に使い始める際は、サンプルデータを削除して新規登録してください。</p>
+  </section>
+
+  <!-- 3 画面構成 -->
+  <section class="doc-section" id="s3">
+    <h2 class="section-title"><span class="section-num">3</span>画面構成</h2>
+    <p>画面上部に<strong>ナビゲーションバー</strong>が表示されます。各メニューをクリックすることで画面を切り替えます。</p>
+
+    <div class="screen-mock">
+      <div class="mock-titlebar">ナビゲーションバー</div>
+      <div class="mock-body" style="background:var(--navy);padding:.7rem 1rem;display:flex;align-items:center;gap:.8rem;flex-wrap:wrap;">
+        <span style="color:#fff;font-weight:700;font-size:.82rem;margin-right:.5rem;">📋 建設コンサル 案件管理</span>
+        <span style="color:rgba(255,255,255,.6);font-size:.75rem;">📊 ダッシュボード</span>
+        <span style="color:rgba(255,255,255,.6);font-size:.75rem;">📋 案件一覧</span>
+        <span style="color:rgba(255,255,255,.6);font-size:.75rem;">🔀 パイプライン</span>
+        <span style="color:rgba(255,255,255,.6);font-size:.75rem;">👷 技術者稼働</span>
+        <span style="color:rgba(255,255,255,.6);font-size:.75rem;">📅 カレンダー</span>
+        <span style="color:rgba(255,255,255,.6);font-size:.75rem;">📈 売上分析</span>
+        <span style="background:var(--gold);color:#1a2a00;font-size:.72rem;font-weight:700;padding:.2rem .7rem;border-radius:4px;margin-left:auto;">＋ 案件登録</span>
+      </div>
+    </div>
+
+    <table class="field-table">
+      <thead><tr><th>メニュー</th><th>機能概要</th></tr></thead>
+      <tbody>
+        <tr><td class="field-name">ダッシュボード</td><td>全案件の概要・期限状況を一覧で確認</td></tr>
+        <tr><td class="field-name">案件一覧</td><td>全案件の詳細データ一覧。検索・絞り込み・CSV出力</td></tr>
+        <tr><td class="field-name">パイプライン</td><td>受注前の商談をステージ別にカンバン管理</td></tr>
+        <tr><td class="field-name">技術者稼働</td><td>担当技術者ごとの稼働案件数・負荷状況</td></tr>
+        <tr><td class="field-name">カレンダー</td><td>工期・契約日を月次カレンダーで確認</td></tr>
+        <tr><td class="field-name">売上分析</td><td>月別・業務種別の受注金額グラフ</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 4 ダッシュボード -->
+  <section class="doc-section" id="s4">
+    <h2 class="section-title"><span class="section-num">4</span>ダッシュボード</h2>
+    <p>起動直後に表示される画面です。全案件の状況をひと目で把握できます。</p>
+
+    <h3 class="subsection-title">統計カード</h3>
+    <div class="screen-mock">
+      <div class="mock-titlebar">統計カード（画面上部）</div>
+      <div class="mock-body">
+        <div class="mock-stat-row">
+          <div class="mock-stat"><div class="mock-stat-val">5</div><div class="mock-stat-lbl">総案件数</div></div>
+          <div class="mock-stat"><div class="mock-stat-val" style="color:#059669">3</div><div class="mock-stat-lbl">進行中</div></div>
+          <div class="mock-stat"><div class="mock-stat-val" style="color:#dc2626">1</div><div class="mock-stat-lbl">期限超過</div></div>
+          <div class="mock-stat"><div class="mock-stat-val" style="color:#7c3aed">3,920万</div><div class="mock-stat-lbl">受注金額合計</div></div>
+        </div>
+      </div>
+    </div>
+    <p>4枚のカードで「総案件数」「進行中件数」「期限超過件数」「受注金額合計（進行中＋完了）」を表示します。</p>
+
+    <h3 class="subsection-title">アラートバナー</h3>
+    <div class="screen-mock">
+      <div class="mock-titlebar">アラートバナー</div>
+      <div class="mock-body">
+        <div class="mock-alert">期限超過案件が1件あります。</div>
+      </div>
+    </div>
+    <p>期限を過ぎた案件がある場合は赤いバナー、30日以内に工期終了を迎える案件がある場合は黄色いバナーが表示されます。バナー右の<span class="ui-btn outline">確認する</span>ボタンを押すと、該当案件だけに絞り込まれます。</p>
+
+    <h3 class="subsection-title">フィルタータブと色分け</h3>
+    <p>テーブル上部のタブで表示する案件を切り替えられます。テーブルの行は以下の色で状況を表します。</p>
+    <div class="color-legend">
+      <div class="cl-item"><div class="cl-swatch" style="background:#fee2e2"></div>赤 — 期限超過（工期終了日を過ぎている）</div>
+      <div class="cl-item"><div class="cl-swatch" style="background:#fef9c3"></div>黄 — 期限間近（工期終了まで30日以内）</div>
+      <div class="cl-item"><div class="cl-swatch" style="background:#f3f4f6"></div>灰 — 完了した案件</div>
+      <div class="cl-item"><div class="cl-swatch" style="background:#ffffff;border:1px solid #e2eaf4"></div>白 — 進行中（問題なし）</div>
+    </div>
+
+    <h3 class="subsection-title">案件の詳細を開く</h3>
+    <p>テーブルの案件名または<span class="ui-btn outline">詳細</span>ボタンをクリックすると、案件詳細ダイアログが表示されます。</p>
+  </section>
+
+  <!-- 5 案件の登録 -->
+  <section class="doc-section" id="s5">
+    <h2 class="section-title"><span class="section-num">5</span>案件の登録</h2>
+
+    <h3 class="subsection-title">新規登録の手順</h3>
+    <div class="steps">
+      <div class="step-item"><div class="step-n">1</div><div class="step-body">画面右上の <span class="ui-btn success">＋ 案件登録</span> ボタンをクリックします。</div></div>
+      <div class="step-item"><div class="step-n">2</div><div class="step-body">登録フォームが表示されます。各項目を入力します（<span style="color:var(--red);font-weight:700">＊</span>マークは必須項目）。</div></div>
+      <div class="step-item"><div class="step-n">3</div><div class="step-body"><span class="ui-btn">💾 保存</span> ボタンをクリックして登録完了です。</div></div>
+    </div>
+
+    <h3 class="subsection-title">入力項目一覧</h3>
+    <table class="field-table">
+      <thead><tr><th>項目名</th><th>必須</th><th>説明</th></tr></thead>
+      <tbody>
+        <tr><td class="field-name">業務ナンバー</td><td class="req">必須</td><td>社内管理番号（例: R6-001）。重複不可。</td></tr>
+        <tr><td class="field-name">案件名</td><td class="req">必須</td><td>業務の正式名称を入力します。</td></tr>
+        <tr><td class="field-name">業務種別</td><td></td><td>橋梁設計・道路設計など10種別から選択。</td></tr>
+        <tr><td class="field-name">ステータス</td><td></td><td>進行中 / 完了 / 中断 から選択（初期値: 進行中）。</td></tr>
+        <tr><td class="field-name">受注金額</td><td></td><td>税込金額を円単位で入力します。</td></tr>
+        <tr><td class="field-name">発注機関名</td><td></td><td>発注元の官公庁・自治体名を入力します。</td></tr>
+        <tr><td class="field-name">相手先担当者名</td><td></td><td>発注機関側の担当者名を入力します。</td></tr>
+        <tr><td class="field-name">契約日</td><td></td><td>契約締結日を選択します。</td></tr>
+        <tr><td class="field-name">工期開始日</td><td></td><td>業務開始日を選択します。</td></tr>
+        <tr><td class="field-name">工期終了日</td><td></td><td>納期（業務終了日）を選択します。期限管理の基準日です。</td></tr>
+        <tr><td class="field-name">担当 / 主任技術者 / 照査技術者</td><td></td><td>技術者名を入力します。候補が表示されるので選択も可能。</td></tr>
+        <tr><td class="field-name">業務進捗率</td><td></td><td>スライダーで0〜100%を5%刻みで設定します。</td></tr>
+        <tr><td class="field-name">メモ・備考</td><td></td><td>特記事項・申し送り事項を自由に入力します。</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout tip"><span class="callout-icon"></span><div class="callout-body"><strong>担当技術者の入力補助</strong>担当・主任技術者・照査技術者の入力欄は、入力した文字に応じて候補が表示されます。過去に入力した技術者名も候補に表示されます。</div></div>
+  </section>
+
+  <!-- 6 案件の編集・削除 -->
+  <section class="doc-section" id="s6">
+    <h2 class="section-title"><span class="section-num">6</span>案件の編集・削除</h2>
+
+    <h3 class="subsection-title">案件を編集する</h3>
+    <div class="steps">
+      <div class="step-item"><div class="step-n">1</div><div class="step-body">案件一覧またはダッシュボードの <span class="ui-btn outline">詳細</span> をクリックして詳細画面を開きます。</div></div>
+      <div class="step-item"><div class="step-n">2</div><div class="step-body">詳細画面右上の <span class="ui-btn outline">✏ 編集</span> ボタンをクリックします。</div></div>
+      <div class="step-item"><div class="step-n">3</div><div class="step-body">登録フォームが開くので、変更したい項目を修正して <span class="ui-btn">💾 保存</span> をクリックします。</div></div>
+    </div>
+
+    <h3 class="subsection-title">進捗率をすばやく更新する</h3>
+    <p>案件詳細画面では、進捗バーの下に <strong>0%〜100%のボタン</strong>が10%刻みで並んでいます。クリックするだけで即座に進捗率が更新されます（フォームを開く必要はありません）。</p>
+
+    <div class="screen-mock">
+      <div class="mock-titlebar">進捗クイック更新ボタン</div>
+      <div class="mock-body" style="display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;">
+        <span style="font-size:.75rem;color:var(--muted);">進捗を更新:</span>
+        <span class="ui-btn outline" style="font-size:.7rem;padding:.15rem .45rem;">0%</span>
+        <span class="ui-btn outline" style="font-size:.7rem;padding:.15rem .45rem;">10%</span>
+        <span class="ui-btn" style="font-size:.7rem;padding:.15rem .45rem;">50%</span>
+        <span class="ui-btn outline" style="font-size:.7rem;padding:.15rem .45rem;">60%</span>
+        <span class="ui-btn outline" style="font-size:.7rem;padding:.15rem .45rem;">70%</span>
+        <span class="ui-btn outline" style="font-size:.7rem;padding:.15rem .45rem;">…</span>
+        <span class="ui-btn outline" style="font-size:.7rem;padding:.15rem .45rem;">100%</span>
+      </div>
+    </div>
+
+    <h3 class="subsection-title">案件を削除する</h3>
+    <div class="steps">
+      <div class="step-item"><div class="step-n">1</div><div class="step-body">案件詳細画面右上の <span class="ui-btn danger">🗑 削除</span> ボタンをクリックします。</div></div>
+      <div class="step-item"><div class="step-n">2</div><div class="step-body">確認ダイアログが表示されます。「OK」を押すと削除が完了します。</div></div>
+    </div>
+    <div class="callout warn"><span class="callout-icon"></span><div class="callout-body"><strong>削除は取り消せません</strong>案件を削除すると、その案件に紐づく活動記録もすべて削除されます。誤操作を防ぐため、削除前にCSV出力でバックアップを取ることをお勧めします。</div></div>
+  </section>
+
+  <!-- 7 活動記録 -->
+  <section class="doc-section" id="s7">
+    <h2 class="section-title"><span class="section-num">7</span>活動記録の追加・管理</h2>
+    <p>案件ごとに「打合せ」「提出」「電話」などの活動履歴を記録できます。発注者との折衝履歴や次のアクションを残しておくことで、担当者が変わっても引き継ぎがスムーズになります。</p>
+
+    <h3 class="subsection-title">活動記録を追加する</h3>
+    <div class="steps">
+      <div class="step-item"><div class="step-n">1</div><div class="step-body">案件詳細画面の「活動履歴」セクション右上の <span class="ui-btn">＋ 記録追加</span> ボタンをクリックします。</div></div>
+      <div class="step-item"><div class="step-n">2</div><div class="step-body">入力フォームに日付・種別・内容を入力します。</div></div>
+      <div class="step-item"><div class="step-n">3</div><div class="step-body"><span class="ui-btn">保存</span> をクリックすると、タイムライン形式で記録が追加されます。</div></div>
+    </div>
+
+    <table class="field-table">
+      <thead><tr><th>項目</th><th>必須</th><th>説明</th></tr></thead>
+      <tbody>
+        <tr><td class="field-name">日付</td><td class="req">必須</td><td>活動を行った日付（初期値は当日）。</td></tr>
+        <tr><td class="field-name">種別</td><td></td><td>打合せ / 提出 / 現地調査 / 電話 / メール / その他</td></tr>
+        <tr><td class="field-name">内容</td><td class="req">必須</td><td>活動内容の詳細を自由記述します。</td></tr>
+        <tr><td class="field-name">担当者</td><td></td><td>活動を行った社内担当者名。</td></tr>
+        <tr><td class="field-name">次のアクション</td><td></td><td>入力すると記録カードに目立つ形で表示されます。</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout tip"><span class="callout-icon"></span><div class="callout-body"><strong>「次のアクション」を積極的に活用</strong>「次のアクション」欄に入力しておくと、詳細画面で青いボックスとして強調表示されます。打合せ後の対応漏れを防ぐのに役立ちます。</div></div>
+  </section>
+
+  <!-- 8 案件一覧 -->
+  <section class="doc-section" id="s8">
+    <h2 class="section-title"><span class="section-num">8</span>案件一覧</h2>
+    <p>登録したすべての案件を表形式で確認できます。検索・絞り込みで必要な案件をすばやく見つけられます。</p>
+
+    <h3 class="subsection-title">検索・絞り込み</h3>
+    <table class="field-table">
+      <thead><tr><th>操作</th><th>説明</th></tr></thead>
+      <tbody>
+        <tr><td class="field-name">テキスト検索</td><td>案件名・業務No.・発注機関名で部分一致検索。入力した瞬間にリアルタイムで絞り込まれます。</td></tr>
+        <tr><td class="field-name">ステータス絞り込み</td><td>進行中 / 完了 / 中断 でフィルタリングします。</td></tr>
+        <tr><td class="field-name">業務種別絞り込み</td><td>橋梁設計・道路設計など業務の種類で絞り込みます。</td></tr>
+        <tr><td class="field-name">担当技術者絞り込み</td><td>特定の技術者が関わる案件（担当・主任・照査を含む）を絞り込みます。</td></tr>
+      </tbody>
+    </table>
+
+    <h3 class="subsection-title">列の並び替え</h3>
+    <p>テーブルのヘッダー行（業務No.・案件名・契約日・工期開始・工期終了）をクリックすると、その列で昇順/降順に並び替えられます。現在の並び順は列名の右に <strong>▲（昇順）</strong> または <strong>▼（降順）</strong> で表示されます。</p>
+
+    <h3 class="subsection-title">CSV出力</h3>
+    <div class="steps">
+      <div class="step-item"><div class="step-n">1</div><div class="step-body">画面右上の <span class="ui-btn outline">⬇ CSV出力</span> ボタンをクリックします。</div></div>
+      <div class="step-item"><div class="step-n">2</div><div class="step-body">現在の絞り込み結果が「案件一覧.csv」としてダウンロードされます。</div></div>
+    </div>
+    <div class="callout tip"><span class="callout-icon"></span><div class="callout-body"><strong>Excelで開くには</strong>ダウンロードしたCSVファイルをExcelで開く際、文字化けを防ぐためにExcelの「データ」→「テキストから」で読み込み、文字コードに「UTF-8」を選択してください。</div></div>
+  </section>
+
+  <!-- 9 パイプライン -->
+  <section class="doc-section" id="s9">
+    <h2 class="section-title"><span class="section-num">9</span>パイプライン管理</h2>
+    <p>受注前の商談・見込み案件をステージ別に管理します。各ステージの件数・金額が自動集計され、営業活動の全体像を把握できます。</p>
+
+    <h3 class="subsection-title">ステージの種類</h3>
+    <div class="color-legend">
+      <div class="cl-item"><div class="cl-swatch" style="background:#6b7280"></div><span class="ui-badge secondary">リード</span> — 情報収集段階の見込み案件</div>
+      <div class="cl-item"><div class="cl-swatch" style="background:#2563a8"></div><span class="ui-badge primary">提案準備</span> — 技術提案書・見積書を準備中</div>
+      <div class="cl-item"><div class="cl-swatch" style="background:#7c3aed"></div><span class="ui-badge" style="background:#ede9fe;color:#5b21b6">提案済</span> — 提案・入札済み、結果待ち</div>
+      <div class="cl-item"><div class="cl-swatch" style="background:#d97706"></div><span class="ui-badge warning">交渉中</span> — 金額・条件の交渉段階</div>
+      <div class="cl-item"><div class="cl-swatch" style="background:#059669"></div><span class="ui-badge success">受注</span> — 受注確定、契約準備中</div>
+      <div class="cl-item"><div class="cl-swatch" style="background:#dc2626"></div><span class="ui-badge danger">失注</span> — 受注に至らなかった案件</div>
+    </div>
+
+    <h3 class="subsection-title">商談を追加する</h3>
+    <div class="steps">
+      <div class="step-item"><div class="step-n">1</div><div class="step-body">画面右上の <span class="ui-btn success">＋ 商談追加</span> ボタンをクリックします。</div></div>
+      <div class="step-item"><div class="step-n">2</div><div class="step-body">案件名・発注機関・ステージ・想定金額・受注確度（%）などを入力します。</div></div>
+      <div class="step-item"><div class="step-n">3</div><div class="step-body"><span class="ui-btn">保存</span> するとカンバンに追加されます。</div></div>
+    </div>
+
+    <h3 class="subsection-title">ステージを変更する</h3>
+    <p>カンバンのカードをクリックすると編集ダイアログが開き、ステージを変更できます。変更後、カードは自動的に該当ステージ列に移動します。</p>
+
+    <div class="callout tip"><span class="callout-icon"></span><div class="callout-body"><strong>期待受注額について</strong>画面上部の「期待値合計」は「想定金額 × 受注確度%」の合計値です。案件の重み付けを反映した現実的な売上予測として活用できます。</div></div>
+  </section>
+
+  <!-- 10 技術者稼働 -->
+  <section class="doc-section" id="s10">
+    <h2 class="section-title"><span class="section-num">10</span>技術者稼働状況</h2>
+    <p>進行中の案件で各技術者が何件担当しているかを一覧表示します。担当・主任技術者・照査技術者のいずれかに名前が登録されていれば集計されます。</p>
+
+    <h3 class="subsection-title">負荷レベルの見方</h3>
+    <div class="color-legend">
+      <div class="cl-item"><div class="cl-swatch" style="background:#059669"></div><span class="ui-badge success">余裕あり</span> — 担当案件1件以下</div>
+      <div class="cl-item"><div class="cl-swatch" style="background:#d97706"></div><span class="ui-badge warning">やや多</span> — 担当案件2〜3件</div>
+      <div class="cl-item"><div class="cl-swatch" style="background:#dc2626"></div><span class="ui-badge danger">高負荷</span> — 担当案件4件以上</div>
+    </div>
+    <div class="callout note"><span class="callout-icon"></span><div class="callout-body"><strong>完了・中断案件はカウントされません</strong>ステータスが「進行中」の案件のみが稼働数に含まれます。</div></div>
+  </section>
+
+  <!-- 11 カレンダー -->
+  <section class="doc-section" id="s11">
+    <h2 class="section-title"><span class="section-num">11</span>案件カレンダー</h2>
+    <p>工期終了日・工期開始日・契約日を月次カレンダーに表示します。締め切りが集中している月を視覚的に把握できます。</p>
+
+    <h3 class="subsection-title">カレンダーの操作</h3>
+    <table class="field-table">
+      <thead><tr><th>操作</th><th>説明</th></tr></thead>
+      <tbody>
+        <tr><td class="field-name">◀ / ▶ ボタン</td><td>前月・翌月に移動します。</td></tr>
+        <tr><td class="field-name">イベントをクリック</td><td>現在はクリックで詳細は表示されません。視認のみです。</td></tr>
+      </tbody>
+    </table>
+
+    <h3 class="subsection-title">イベントの色分け</h3>
+    <div class="color-legend">
+      <div class="cl-item"><div class="cl-swatch" style="background:#fee2e2;border:1px solid #fca5a5"></div>赤 — 工期終了日</div>
+      <div class="cl-item"><div class="cl-swatch" style="background:#d1fae5;border:1px solid #6ee7b7"></div>緑 — 工期開始日</div>
+      <div class="cl-item"><div class="cl-swatch" style="background:#ede9fe;border:1px solid #c4b5fd"></div>紫 — 契約日</div>
+    </div>
+
+    <h3 class="subsection-title">直近の期限一覧（右サイドバー）</h3>
+    <p>カレンダー右側に「直近60日以内に工期終了を迎える案件」が一覧表示されます。残日数が7日以内の案件は赤く強調されます。</p>
+  </section>
+
+  <!-- 12 売上分析 -->
+  <section class="doc-section" id="s12">
+    <h2 class="section-title"><span class="section-num">12</span>売上分析</h2>
+    <p>受注金額を年度別・月別・業務種別でグラフ分析します。営業実績の振り返りや目標設定に活用できます。</p>
+
+    <h3 class="subsection-title">年度の切り替え</h3>
+    <p>画面右上のドロップダウンメニューで年を切り替えると、その年の「契約日」を持つ案件のデータに絞り込まれます。</p>
+
+    <h3 class="subsection-title">グラフの見方</h3>
+    <table class="field-table">
+      <thead><tr><th>グラフ</th><th>内容</th></tr></thead>
+      <tbody>
+        <tr><td class="field-name">月別受注金額（棒グラフ）</td><td>選択年の月ごとの受注金額（万円単位）。</td></tr>
+        <tr><td class="field-name">業務種別構成（ドーナツグラフ）</td><td>選択年の業務種別ごとの受注金額の割合。</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout note"><span class="callout-icon"></span><div class="callout-body"><strong>「契約日」が集計の基準です</strong>案件の受注金額は「契約日」の年月で集計されます。契約日が未入力の案件はグラフに反映されませんので、正確な分析のためには契約日を必ず入力してください。</div></div>
+  </section>
+
+  <!-- 13 バックアップ -->
+  <section class="doc-section" id="s13">
+    <h2 class="section-title"><span class="section-num">13</span>データ管理・バックアップ</h2>
+
+    <h3 class="subsection-title">データの保存場所</h3>
+    <p>すべてのデータはブラウザの <strong>localStorage（ローカルストレージ）</strong> に保存されます。HTMLファイルと同じブラウザを使う限り、パソコンを再起動しても、ブラウザを閉じてもデータは保持されます。</p>
+
+    <div class="callout warn"><span class="callout-icon"></span><div class="callout-body"><strong>以下の操作でデータが失われます</strong>
+      <ul style="margin-top:.4rem;padding-left:1.2rem;list-style:disc;font-size:.84rem;">
+        <li>ブラウザのキャッシュ・履歴・Cookieをすべて削除した場合</li>
+        <li>別のブラウザ（ChromeとEdgeなど）でファイルを開いた場合（データは共有されません）</li>
+        <li>別のパソコンでファイルを開いた場合</li>
+      </ul>
+    </div></div>
+
+    <h3 class="subsection-title">定期的なバックアップ（推奨）</h3>
+    <div class="steps">
+      <div class="step-item"><div class="step-n">1</div><div class="step-body">「案件一覧」画面を開きます。</div></div>
+      <div class="step-item"><div class="step-n">2</div><div class="step-body">絞り込みをすべて解除して「すべての案件」を表示した状態にします。</div></div>
+      <div class="step-item"><div class="step-n">3</div><div class="step-body"><span class="ui-btn outline">⬇ CSV出力</span> ボタンをクリックしてCSVファイルをダウンロードします。</div></div>
+      <div class="step-item"><div class="step-n">4</div><div class="step-body">ダウンロードしたCSVファイルを日付付きのフォルダに保存します（例: <code style="background:var(--code-bg);padding:.1rem .4rem;border-radius:4px;font-size:.82rem;">backup_20250101.csv</code>）。</div></div>
+    </div>
+    <div class="callout tip"><span class="callout-icon"></span><div class="callout-body"><strong>月に1回のバックアップを推奨</strong>CSV出力したデータをExcelで保管しておくと、万が一データが失われた場合の記録として活用できます。</div></div>
+
+    <h3 class="subsection-title">データのリセット</h3>
+    <p>すべてのデータを初期化したい場合は、ブラウザの開発者ツールでlocalStorageを削除するか、ブラウザの「サイトデータを削除」機能を使います。削除後、ファイルを再度開くとサンプルデータが投入されます。</p>
+  </section>
+
+  <!-- 14 FAQ -->
+  <section class="doc-section" id="s14">
+    <h2 class="section-title"><span class="section-num">14</span>よくある質問</h2>
+
+    <div class="faq-item">
+      <div class="faq-q">データはどこに保存されますか？インターネットに送信されますか？</div>
+      <div class="faq-a">データはすべてお使いのパソコンのブラウザ内（localStorage）にのみ保存されます。外部サーバーへの送信は一切ありません。オフライン環境でも完全に動作します。</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">複数のパソコンで同じデータを使いたい</div>
+      <div class="faq-a">localStorageはブラウザごとに独立しているため、自動での同期はできません。「案件一覧」のCSV出力を使ってデータをエクスポートし、別のパソコンで参照する運用をお勧めします。将来的な機能拡張として検討しています。</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">ブラウザを更新したらデータが消えた</div>
+      <div class="faq-a">ブラウザのキャッシュ削除や「閲覧履歴の消去」でlocalStorageが削除された可能性があります。定期的にCSV出力でバックアップを取ることをお勧めします（第13章参照）。</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">スマートフォンやタブレットでも使えますか？</div>
+      <div class="faq-a">iOS・Androidのブラウザでも動作しますが、テーブルの横スクロールや小さなボタン操作がやや使いにくい場合があります。主にPC・ノートパソコンでのご利用を推奨します。</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">案件数・担当者数に上限はありますか？</div>
+      <div class="faq-a">技術的な上限はありませんが、localStorage の容量は通常ブラウザごとに5〜10MB程度です。数百件規模の案件であれば問題なく使用できます。</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">業務種別や担当者名の選択肢を変更したい</div>
+      <div class="faq-a">現在のバージョンでは選択肢は固定です。変更が必要な場合は、HTMLファイルのカスタマイズ（PROJECT_TYPES・ENGINEERS の配列を編集）にて対応できます。ご連絡ください。</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">印刷して紙で配布できますか？</div>
+      <div class="faq-a">本説明書はブラウザの印刷機能（Ctrl+P / Cmd+P）から印刷できます。印刷時はサイドバーが非表示になり、本文のみが出力されます。</div>
+    </div>
+
+  </section>
+
+</main>
+</div>
+
+<script>
+// TOC active state on scroll
+const sections = document.querySelectorAll('.doc-section');
+const links = document.querySelectorAll('.toc-link');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      links.forEach(l => l.classList.remove('active'));
+      const active = document.querySelector(`.toc-link[href="#${e.target.id}"]`);
+      if (active) {
+        active.classList.add('active');
+        active.scrollIntoView({ block: 'nearest' });
+      }
+    }
+  });
+}, { rootMargin: '-30% 0px -65% 0px' });
+sections.forEach(s => observer.observe(s));
+</script>
