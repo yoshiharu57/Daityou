@@ -10,12 +10,12 @@ from routers import projects, activity_logs, opportunities
 
 models.Base.metadata.create_all(bind=engine)
 
-# 初回起動時にサンプルデータを投入（橋梁が0件のときのみ）
+# 初回起動時にサンプルデータを投入（案件が0件のときのみ）
 def _seed_if_empty():
     from database import SessionLocal
     db = SessionLocal()
     try:
-        if db.query(models.Bridge).count() == 0:
+        if db.query(models.Project).count() == 0:
             import seed_data  # noqa: F401
     finally:
         db.close()
