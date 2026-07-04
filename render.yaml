@@ -1,9 +1,3 @@
-databases:
-  - name: construction-pm-db
-    databaseName: construction_pm
-    user: cpms_user
-    plan: free
-
 services:
   - type: web
     name: construction-pm
@@ -13,8 +7,3 @@ services:
     buildCommand: bash render-build.sh
     startCommand: cd backend && uvicorn main:app --host 0.0.0.0 --port $PORT
     autoDeploy: true
-    envVars:
-      - key: DATABASE_URL
-        fromDatabase:
-          name: construction-pm-db
-          property: connectionString
