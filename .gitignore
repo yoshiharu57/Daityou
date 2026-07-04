@@ -18,7 +18,6 @@ env/
 
 # Node
 node_modules/
-frontend/dist/
 
 # Uploads (do not commit actual files)
 backend/uploads/
